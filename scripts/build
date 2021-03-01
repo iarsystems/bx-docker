@@ -1,0 +1,78 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2020-2021 IAR Systems AB
+#
+# build
+#
+# Build a Docker image containing the IAR Build Tools
+#
+# See LICENSE for detailed license information
+#
+
+function _bx_show_help() {
+  echo "Usage: ${BASH_SOURCE[0]} <path-to>/bx<package>.deb" 
+  echo " "
+}
+
+function _bx_build_docker_image()
+{
+  if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
+    echo "ERROR: the script should be executed directly. Do not source."
+    _bx_show_help
+    return 1
+  fi
+  
+  if [ $# -ne 1 ]; then
+    _bx_show_help
+    return 1
+  fi
+  
+  local SCRIPT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
+  local PKG_PATH=$(dirname $1)
+  local PKG_FILE=$(basename $1)
+  local PKG_BASE=${PKG_FILE%.deb}
+  local PKG_NAME=$(echo $PKG_BASE | cut -d- -f1)
+  local PKG_VERSION=$(echo $PKG_BASE | cut -d- -f2)
+  local IMG_TZ=$(cat /etc/timezone)
+
+  if [ ! -f "${PKG_PATH}/${PKG_FILE}" ]; then
+    echo "ERROR: file [${1}] not found."
+    _bx_show_help
+    return 1
+  fi
+
+  case ${PKG_NAME^^} in
+    BXARM) local BX_ARCH=arm;;
+    BXARMFS) local BX_ARCH=arm;;
+    BXRH850) local BX_ARCH=rh850;;
+    BXRH850FS) local BX_ARCH=rh850;;
+    BXRISCV) local BX_ARCH=riscv;;
+    BXRISCVFS) local BX_ARCH=riscv;;
+    BXRX) local BX_ARCH=rx;;
+    BXRXFS) local BX_ARCH=rx;;
+    *) echo "ERROR: invalid package. (${PKG_NAME^^})"; _bx_show_help; return 1;;
+  esac
+  
+  echo "ARCH is $BX_ARCH"
+  echo "VERSION is $PKG_VERSION"
+  
+  # Temporarily copy the installer package to the Docker context
+  cp -v "${PKG_PATH}/${PKG_FILE}" "${SCRIPT_PATH}/../images"
+
+  echo -- Building the Docker image for ${PKG_NAME,,}-${PKG_VERSION}...
+  docker build --build-arg USER_ID=$(id -u) \
+               --build-arg PKG_NAME=${PKG_NAME,,} \
+               --build-arg PKG_FILE=${PKG_FILE} \
+               --build-arg BX_ARCH=${BX_ARCH} \
+               --build-arg BX_VERSION=${PKG_VERSION} \
+               --build-arg IMG_TZ=${IMG_TZ} \
+               -t iarsystems/${PKG_NAME}:${PKG_VERSION} \
+               --rm=true --force-rm=true \
+               ${SCRIPT_PATH}/../images
+  # Cleanup               
+  rm "${SCRIPT_PATH}/../images/${PKG_FILE}" 2>/dev/null
+}
+_bx_build_docker_image $@
+unset -f _bx_build_docker_image
+unset -f __bx_show_help

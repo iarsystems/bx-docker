@@ -1,0 +1,8 @@
+**/*.deb
+
+projects/*/*.html
+projects/*/Backup*
+projects/*/Debug
+projects/*/Release
+projects/*/settings
+projects/*/*.dep
