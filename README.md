@@ -181,7 +181,7 @@ In order to achieve that, we need to add the desired command that sources [alias
 
 The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. We just need append the command to set the desired aliases for the chosen `<package>` and `<version>` in __one__ of them. We can perform this change from an editor, or straight from the command line. For example:
 ```
-source ~/bx-docker/scripts/aliases-set <package> <version> >> ~/.bashrc
+echo "source ~/bx-docker/scripts/aliases-set <package> <version>" >> ~/.bashrc
 ```
 Now, the aliases for running the IAR Build Tools from the chosen Docker Image should always become available when a new bash shell session is launched, unless:
 * The corresponding `iarsystems/bx<package>:<version>` Docker image is inaccessible.
