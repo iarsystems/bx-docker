@@ -13,7 +13,7 @@
 function _bx_show_help() 
 {
   echo "Usage: source ${BASH_SOURCE[0]} <package> <version>" 
-  echo "  accepted packages: arm armfs rh850 rh850fs riscv rx "
+  echo "  accepted packages: arm armfs rh850 rh850fs riscv rl78 rx "
   echo " "  
 }
 
@@ -21,7 +21,7 @@ function _bx_show_help()
 function _bx-aliases-set() 
 {
   if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
-    echo "ERROR: the script is not being properly sourced."
+    echo "ERROR: the script is not being properly sourced." >&2
     _bx_show_help
     return 1
   fi
@@ -39,14 +39,16 @@ function _bx-aliases-set()
     RH850FS) local BX_ARCH=rh850;;
     RISCV) local BX_ARCH=riscv;;
     RISCVFS) local BX_ARCH=riscv;;
+    RL78) local BX_ARCH=rl78;;
+    RL78FS) local BX_ARCH=rl78;;
     RX) local BX_ARCH=rx;;
     RXFS) local BX_ARCH=rx;;
-    *) echo "ERROR: specified <package> parameter is not accepted -- (${1^^})."; return 1;;
+    *) echo "ERROR: specified <package> parameter is not accepted -- (${1^^})." >&2; return 1;;
   esac
   
   # Check valid semantic version
   if [[ ${2} =~ [^[:digit:].] ]]; then
-    echo "ERROR: specified <version> parameter must only include numbers and a dot ( . ) as separator -- (${2})."
+    echo "ERROR: specified <version> parameter must only include numbers and a dot ( . ) as separator -- (${2})." >&2
     return 1
   fi
   
@@ -54,7 +56,7 @@ function _bx-aliases-set()
   declare -a BX_DOCKER_IMAGES_LIST=($(docker images iarsystems/bx${1,,} | tail -n +2 | awk '{print $1}' | cut -f2 -d/ ))
   declare -a BX_DOCKER_VERSION_LIST=($(docker images iarsystems/bx${1,,}:${2} | tail -n +2 | awk '{print $2}'))
   if [ -z ${BX_DOCKER_IMAGES_LIST} ] || [ -z ${BX_DOCKER_VERSION_LIST} ]; then
-    echo "ERROR: no Docker image was found -- iarsystems/bx${1,,}:${2}."
+    echo "ERROR: no Docker image was found -- iarsystems/bx${1,,}:${2}." >&2
     local CURRENT_IMAGES=$(docker images iarsystems/bx* | tail -n +2 | awk '{print $1":"$2}')
     if [[ ! -z ${CURRENT_IMAGES} ]]; then
       echo "IAR Build Tools Docker images found in this host:"

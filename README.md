@@ -26,11 +26,11 @@ If you have a question specifically related to this tutorial, you might be inter
 As we are going to be dealing with different packages, for different architectures and their respective versions, it unfolds many different possibilites for this tutorial. Establishing some useful conventions becomes convenient.
 
 The following conventions are going to be used:
-| __Placeholder__ | __Meaning__                                                                        |
-| :-------------- | :--------------------------------------------------------------------------------- |
-| `<arch>`        | __Architecture__<br/>Valid: `arm`, `riscv`, `rh850`, `rx`                          |
-| `<package>`     | __Product package__<br/>Valid: `arm`, `armfs`, `riscv`, `rh850`, `rh850fs`, `rx`   |
-| `<version>`     | __Package version__<br/>Valid: `major`.`minor`.`patch` `[.build]`                  |
+| __Placeholder__ | __Meaning__                                                                                |
+| :-------------- | :----------------------------------------------------------------------------------------- |
+| `<arch>`        | __Architecture__<br/>Valid: `arm`, `riscv`, `rh850`, `rl78`, `rx`                          |
+| `<package>`     | __Product package__<br/>Valid: `arm`, `armfs`, `riscv`, `rh850`, `rh850fs`, `rl78`, `rx`   |
+| `<version>`     | __Package version__<br/>Valid: `major`.`minor`.`patch` `[.build]`                          |
 
 Examples:
 | __Package/Version__       | __Meaning__                                                                                                                                    |
@@ -110,6 +110,7 @@ The table below lists the IAR Build Tools installer packages that have been succ
 | `bxriscv-1.40.1.deb`                                               | `riscv`         | 1.40.1                        | `riscv`      |
 | `bxrh850-2.21.1.deb`                                               | `rh850`         | 2.21.1                        | `rh850`      |
 | `bxrh850fs-2.21.2.1803.deb`                                        | `rh850fs`       | 2.21.2.1803                   | `rh850`      |
+| `bxrl78-4.21.1.deb`                                                | `rl78`          | 4.21.1                        | `rl78`       |
 | `bxrx-4.20.1.deb`                                                  | `rx`            | 4.20.1                        | `rx`         |
 
 Launch a bash shell and __clone__ the `bx-docker` repository to the user's home directory (`~`).
@@ -119,17 +120,20 @@ $ git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker
 
 __Build__ the Docker image for the desired bx`<package>`-`<version>`.deb using the following command.
 ```
-$ ~/bx-docker/scripts/build <path-to>/bx<package>-<version>.deb
+$ ~/bx-docker/scripts/build <path-to>/bx<package>-<version>.deb [image-user:[image-group]]
 ```
+>__Note__
+>* The `image-user` and `image-group` parameters are optional. The build script will default to $USER:docker.
 
 The [__build__](scripts/build) script will automatically tag the Docker image to be built as `iarsystems/bx<package>:<version>`.
 
 Multiple images for different packages and their versions can be built in seconds by invoking the `build` script sucessive times with a corresponding installer package. It is possible to invoke `docker images iarsystems/*` to list any Docker images which were already built. For example:
 ```
 REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE
+iarsystems/bxrl78                  4.21.1              7a045de937c8        58 seconds ago      2.09GB
 iarsystems/bxarm                   9.10.1              cef45bb09322        5 minutes ago       2.08GB
 iarsystems/bxarmfs                 8.50.10.35167       527420cb4fcf        8 minutes ago       1.96GB
-iarsystems/bxriscv                 1.40.1              89bd0878856f        15 minutes ago      2.05GB
+iarsystems/bxriscv                 1.40.1              89bd0878856f        About an hour ago   2.05GB
 iarsystems/bxarm                   8.50.9              ffcfa26ef829        About an hour ago   2GB
 iarsystems/bxrx                    4.20.1              ab1b39f07955        About an hour ago   1.4GB
 iarsystems/bxrh850fs               2.21.2.1803         735d80b00832        About an hour ago   2.33GB
@@ -271,6 +275,7 @@ For example, to __build__ using the _"Debug" build configuration_ from the `c-st
 | `arm`     | `iarbuild bx-docker/projects/arm/c-stat.ewp "Debug"`       |
 | `riscv`   | `iarbuild bx-docker/projects/riscv/c-stat.ewp "Debug"`     |
 | `rh850`   | `iarbuild bx-docker/projects/rh850/c-stat.ewp "Debug"`     |
+| `rl78`    | `iarbuild bx-docker/projects/rl78/c-stat.ewp "Debug"`      |
 | `rx`      | `iarbuild bx-docker/projects/rx/c-stat.ewp "Debug"`        |
 
 > __Notes__
@@ -292,6 +297,7 @@ For example, __static code analysis__ with C-STAT using the _"Release" build con
 | `arm`     | `iarbuild bx-docker/projects/arm/c-stat.ewp -cstat_analyze "Release" -parallel $(nproc)`       |
 | `riscv`   | `iarbuild bx-docker/projects/riscv/c-stat.ewp -cstat_analyze "Release" -parallel $(nproc)`     |
 | `rh850`   | `iarbuild bx-docker/projects/rh850/c-stat.ewp -cstat_analyze "Release" -parallel $(nproc)`     |
+| `rl78`    | `iarbuild bx-docker/projects/rl78/c-stat.ewp -cstat_analyze "Release" -parallel $(nproc)`      |
 | `rx`      | `iarbuild bx-docker/projects/rx/c-stat.ewp -cstat_analyze "Release" -parallel $(nproc)`        |
 
 By default, the [C-STAT](https://www.iar.com/cstat) static analysis outputs a SQLite database named `cstat.db`. Then, use `ireport` to process the database and generate an automatic _full HTML report_ containing all the warnings about coding violations for the `<project>`'s selected checks:
@@ -307,6 +313,7 @@ For example, to generate a __full HTML report__ from the previous project analys
 | `arm`     | `ireport --full --db bx-docker/projects/arm/Release/Obj/cstat.db --project bx-docker/projects/arm/c-stat.ewp`     |
 | `riscv`   | `ireport --full --db bx-docker/projects/riscv/Release/Obj/cstat.db --project bx-docker/projects/riscv/c-stat.ewp` |
 | `rh850`   | `ireport --full --db bx-docker/projects/rh850/Release/Obj/cstat.db --project bx-docker/projects/rh850/c-stat.ewp` |
+| `rl78`    | `ireport --full --db bx-docker/projects/rl78/Release/Obj/cstat.db --project bx-docker/projects/rl78/c-stat.ewp`   |
 | `rx`      | `ireport --full --db bx-docker/projects/rx/Release/Obj/cstat.db --project bx-docker/projects/rx/c-stat.ewp`       |
 
 The output will be similar to:

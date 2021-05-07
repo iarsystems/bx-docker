@@ -12,6 +12,7 @@ FROM ubuntu:20.04
 
 # User's UID, package, architecture and version 
 ARG  USER_ID
+ARG  GROUP_ID
 ARG  PKG_FILE
 ARG  PKG_NAME
 ARG  BX_ARCH
@@ -44,8 +45,9 @@ ENV  PATH="${IAR_BX_PATH}/${BX_ARCH}/bin:${IAR_BX_PATH}/common/bin:$PATH"
 
 # Create the image with an user named `iaruser` using the same UID from the host's user
 # For convenience, the user `iaruser` will be added to the "sudo" group 
-RUN  useradd --create-home --uid ${USER_ID} iaruser && \
-     echo "iaruser:iaruser" | chpasswd && \
+RUN  groupadd -g ${GROUP_ID} docker && \
+     useradd --create-home --uid ${USER_ID} --gid ${GROUP_ID} iaruser && \
+     echo "iaruser:docker" | chpasswd && \
      adduser iaruser sudo 
 
 # Copy the .deb package from the host to the image's /tmp directory
@@ -57,15 +59,16 @@ RUN  dpkg --install /tmp/${PKG_FILE} && \
 
 # Setup the IAR_BUILD_PATH
 RUN  mkdir ${IAR_BUILD_PATH} && \
-     chmod u+rwx -R ${IAR_BUILD_PATH} && \
-     chmod g+rwx -R ${IAR_BUILD_PATH} && \
-     chown iaruser:iaruser ${IAR_BUILD_PATH}
+     chmod ug+rwx -R ${IAR_BUILD_PATH} && \
+     chown iaruser:docker ${IAR_BUILD_PATH}
 
 # Setup the IAR_LMS_SETTINGS_DIR
 RUN  mkdir -p ${IAR_LMS_SETTINGS_DIR} && \
-     chmod u+rwx -R ${IAR_LMS_SETTINGS_DIR} && \
-     chmod g+rwx -R ${IAR_LMS_SETTINGS_DIR} && \
-     chown iaruser:iaruser ${IAR_LMS_SETTINGS_DIR} 
+     chmod ug+rwx -R ${IAR_LMS_SETTINGS_DIR} && \
+     chown iaruser:docker ${IAR_LMS_SETTINGS_DIR}
+
+# Set the user mask to allow group to write
+RUN  echo "umask 002" >> /home/iaruser/.bashrc
 
 # Setup the initial user and work directory for the image
 USER iaruser 
