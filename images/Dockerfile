@@ -46,7 +46,7 @@ ENV  PATH="${IAR_BX_PATH}/${BX_ARCH}/bin:${IAR_BX_PATH}/common/bin:$PATH"
 # Create the image with an user named `iaruser` using the same UID from the host's user
 # For convenience, the user `iaruser` will be added to the "sudo" group 
 RUN  groupadd -g ${GROUP_ID} docker && \
-     useradd --create-home --uid ${USER_ID} --gid ${GROUP_ID} iaruser && \
+     useradd --no-log-init --create-home --uid ${USER_ID} --gid ${GROUP_ID} iaruser && \
      echo "iaruser:docker" | chpasswd && \
      adduser iaruser sudo 
 
