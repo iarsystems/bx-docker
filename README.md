@@ -10,18 +10,6 @@ If you have a question specifically related to this tutorial, you might be inter
 > * Before you start the walkthrough, make sure you have a non-root super user account - *a user with __sudo__ privileges* - if you need to install the _Docker Engine_ on the _Ubuntu host_. If you already have the _Docker Engine_ in place, the standard user account has to belong to the __docker__ group. 
 > * _IAR Systems only provides what is considered to be the bare essential information for the completion of this tutorial when it comes to Ubuntu, Linux, Docker, Bash and Git in general. That way, it becomes straightforward for any user willing to follow the steps until the end. Beyond this point, as in production, a proper level of familiarity with these platforms becomes a self-evident pre-requisite._
 
-
-## Table of Contents
-* [Conventions](#conventions)
-* [Installing Docker](#installing-docker)
-* [Build a Docker image with the IAR Build Tools](#build-a-docker-image-with-the-iar-build-tools)
-* [Setup host environment](#setup-host-environment)
-* [Host license configuration](#host-license-configuration)
-* [Using the IAR Build Tools from a Docker container](#using-the-iar-build-tools-from-a-docker-container)
-* [Additional resources](#additional-resources)
-* [Summary](#summary)
-
-
 ## Conventions
 As we are going to be dealing with different packages, for different architectures and their respective versions, it unfolds many different possibilites for this tutorial. Establishing some useful conventions becomes convenient.
 
