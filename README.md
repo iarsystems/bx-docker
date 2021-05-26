@@ -6,6 +6,8 @@ Each of the __IAR Build Tools__ packages requires its specific license. Please f
 
 If you have a question specifically related to this tutorial, you might be interested in verifying if it was already answered from [earlier questions][repo-old-issue-url]. Or, [ask a new question][repo-new-issue-url] if you could not find any answer for your question. 
 
+If you want to be notifed in your GitHub inbox about significant updates to this tutorial, you can start __watching__ this repository. You can customize which types of notification you want to get. Read more about [notifications](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/setting-up-notifications/about-notifications) and how to [customize](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/setting-up-notifications/about-notifications#customizing-notifications-and-subscriptions) them.
+
 > __Important:__ 
 > * Before you start the walkthrough, make sure you have a non-root super user account - *a user with __sudo__ privileges* - if you need to install the _Docker Engine_ on the _Ubuntu host_. If you already have the _Docker Engine_ in place, the standard user account has to belong to the __docker__ group. 
 > * _IAR Systems only provides what is considered to be the bare essential information for the completion of this tutorial when it comes to Ubuntu, Linux, Docker, Bash and Git in general. That way, it becomes straightforward for any user willing to follow the steps until the end. Beyond this point, as in production, a proper level of familiarity with these platforms becomes a self-evident pre-requisite._
