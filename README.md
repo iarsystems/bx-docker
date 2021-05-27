@@ -153,7 +153,7 @@ source ~/bx-docker/scripts/aliases-set <package> <version>
 >    .. Using Docker image: iarsystems/bx<package>:<version>.
 > ```
 
-The __alias-set__ script will only set the aliases for the IAR Build Tools if the corresponding Docker image can be found in the host.
+The __aliases-set__ script will only set the aliases for the IAR Build Tools if the corresponding Docker image can be found in the host.
 
 From this point onwards, when any of the IAR Build Tools is invoked, the aliases will take place. The corresponding Docker container for the `iarsystems/bx<package>:<version>` image will be spawned, running the selected tool. When the tool operation is completed, the container is destroyed.
     
@@ -164,7 +164,7 @@ alias | grep iarsystems
 
 ### Sticking with the aliases
 Once we have the Docker images built, we have the option to make aliases settings for a single Docker image __persistent__.
-In order to achieve that, we need to add the desired command that sources [alias-set](scripts/alias-set) script into one of the various configuration files that are read when a new bash shell session is launched. 
+In order to achieve that, we need to add the desired command that sources [aliases-set](scripts/aliases-set) script into one of the various configuration files that are read when a new bash shell session is launched. 
 
 The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. We just need append the command to set the desired aliases for the chosen `<package>` and `<version>` in __one__ of them. We can perform this change from an editor, or straight from the command line. For example:
 ```
@@ -174,7 +174,7 @@ echo "source ~/bx-docker/scripts/aliases-set <package> <version>" >> ~/.bashrc
 Now, the aliases for running the IAR Build Tools from the chosen Docker Image should always become available when a new bash shell session is launched, unless:
 * The corresponding `iarsystems/bx<package>:<version>` Docker image is inaccessible.
 * The chosen bash configuration file is changed and the command for sourcing the alias is removed.
-* The [alias-unset](scripts/alias-unset) is invoked during the current bash session.
+* The [aliases-unset](scripts/aliases-unset) is invoked during the current bash session.
 
 > __Important__
 > * The [aliases-set](scripts/aliases-set) script is a general solution to make the usage of the IAR Build Tools seamless.
