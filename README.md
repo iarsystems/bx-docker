@@ -137,7 +137,7 @@ The general syntax for declaring an alias directly from the command line is:
 >```
 
 ### Unsetting previous aliases
-In order to avoid potential conflicts between aliases for tools from different images, start with the [__alias-unset__](scripts/aliases-unset) script. The script will quickly unset any aliases for the IAR Build Tools that might have been previously set.
+In order to avoid potential conflicts between aliases for tools from different images, start with the [__aliases-unset__](scripts/aliases-unset) script. The script will quickly unset any aliases for the IAR Build Tools that might have been previously set.
 ```
 source ~/bx-docker/scripts/aliases-unset
 ```
