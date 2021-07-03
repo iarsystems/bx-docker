@@ -69,7 +69,7 @@ function _bx-aliases-set()
 
   local BX_VERSION=${2}
   
-  local CMD=$(printf "docker run --rm -v \$PWD:/build -v \$IAR_LMS_SETTINGS_DIR:/.lms iarsystems/bx${1,,}:${BX_VERSION}")
+  local CMD=$(printf "docker run --rm -h ${HOSTNAME} -v \$PWD:/build -v \$IAR_LMS_SETTINGS_DIR:/.lms iarsystems/bx${1,,}:${BX_VERSION}")
   # <arch> execs
   local IASMARCH=$(printf "alias iasm${BX_ARCH}='${CMD} iasm${BX_ARCH}'")
   eval ${IASMARCH} 
