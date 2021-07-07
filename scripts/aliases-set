@@ -102,7 +102,7 @@ function _bx-aliases-set()
   eval $LLM 
   local LICINFO=$(printf "alias licenseinfo='${CMD} licenseinfo'")
   eval $LICINFO 
-  local BXARCH_DOCKER_INTERACTIVE=$(printf "docker run --rm -v \$PWD:/build -v \$IAR_LMS_SETTINGS_DIR:/.lms -it iarsystems/bx${1,,}:${BX_VERSION}")
+  local BXARCH_DOCKER_INTERACTIVE=$(printf "docker run --rm -h ${HOSTNAME} -v \$PWD:/build -v \$IAR_LMS_SETTINGS_DIR:/.lms -it iarsystems/bx${1,,}:${BX_VERSION}")
   local BX_IT=$(printf "alias bx${1,,}-docker-interactive='$BXARCH_DOCKER_INTERACTIVE'")
   eval $BX_IT
   
