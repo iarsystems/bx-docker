@@ -2,33 +2,41 @@
 # Copyright (c) 2020-2021 IAR Systems AB
 #
 # Dockerfile for the IAR Build Tools (BX)
-#
-# Creates a bare minimal Docker image for the IAR Build Tools ((BX)
+#   - Creates a bare minimal Docker image for the IAR Build Tools
 #
 # See LICENSE for detailed license information
 #
 
 FROM ubuntu:20.04
 
-# User's UID, package, architecture and version 
-ARG  USER_ID
-ARG  GROUP_ID
-ARG  PKG_FILE
-ARG  PKG_NAME
-ARG  BX_ARCH
-ARG  BX_VERSION
-ARG  IMG_TZ
+# User's UID, GID, package, architecture and version 
+# These arguments are taken from scripts/build execution
+ARG  USER_ID \
+     GROUP_ID \
+     PKG_FILE \
+     PKG_NAME \
+     BX_ARCH \
+     BX_VERSION \
+     IMG_TZ
 
-# Configure Ubuntu's timezone
+# [Optional] Configure Ubuntu's timezone
 ENV  TZ=${IMG_TZ}
-RUN  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+     echo $TZ > /etc/timezone
 
-# Optional - configure the Ubuntu's locale (useful for CMake users)
+# [Optional] Configure the Ubuntu's locale (useful for CMake users)
 ENV  LC_ALL=C
 
-# Updates the Ubuntu packages, install sudo and cleanup
+# Update the Ubuntu packages catalog, install packages and cleanup
+# Packages reasoning
+#  sudo                      : convenience for interactive mode
+#  libsqlite3-0              : used by iarbuild
+#  libxml2, libicu66, tzdata : used by C-STAT
 RUN  apt-get update && \
-     apt-get install sudo libxml2 libicu66 tzdata libsqlite3-0 && \
+     DEBIAN_FRONTEND="noninteractive" apt-get install -y \
+     sudo \
+     libsqlite3-0 \
+     libxml2 libicu66 tzdata && \
      apt-get clean autoclean && \
      apt-get autoremove -y && \
      rm -rf /var/lib/apt/lists/*
