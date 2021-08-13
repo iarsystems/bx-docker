@@ -162,7 +162,7 @@ Aliases only last for the current bash shell session's lifetime. It is possible 
 
 One way of achieving that is to source the [aliases-set](scripts/aliases-set) script whenever a new bash shell is launched. 
 
-The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. With that in mind, the __aliases-set__ script can be sourced while pointing to the desired `iarsystems/bx<package>:<version>` image. 
+The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. With that in mind, the __aliases-set__ script can be sourced while pointing to the desired `iarsystems/bx<package>:<version>` image. The command `source <path-to>/aliases-set <package> <version>` should be appended to the desired bash configuration file.
  
 It is possible to perform this change directy from the shell. For example:
 ```
@@ -171,7 +171,7 @@ echo "source ~/bx-docker/scripts/aliases-set <package> <version>" >> ~/.bashrc
 
 Now, the aliases for running the IAR Build Tools from the `iarsystems/bx<package>:<version>` Docker image will be available for new shell sessions, __unless__:
 * The corresponding `iarsystems/bx<package>:<version>` Docker image becomes inaccessible.
-* The bash configuration file that sources the __alias-set__ script was modified and the command has been removed. 
+* The bash configuration file that sources the __aliases-set__ script was modified and the command has been removed. 
  
 >:warning: Ultimately, these aliases are __optional__. An user can take the [aliases-set](scripts/aliases-set) script as initial reference for any suitable customizations.
 
