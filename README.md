@@ -129,21 +129,16 @@ iarsystems/bxarm                   8.50.6              ad9209426630        About
 
 
 ## Setup Host environment
-In this section, we will take advantage of __bash aliases__ so we can simplify how we run the containerized IAR Build Tools that were installed within the Docker image. Declaring aliases in bash is straightforward. Aliases can last only for the current bash shell session's lifetime.
+In this section, we will take advantage of __bash aliases__ so we can simplify how we run the containerized IAR Build Tools that were installed within the Docker image. 
 
-The general syntax for declaring an alias directly from the command line is:
+The general syntax for declaring an alias in bash is:
 >```
 >alias <alias-name>='<command-to-run>'
 >```
-
-### Unsetting previous aliases
-In order to avoid potential conflicts between aliases for tools from different images, start with the [__aliases-unset__](scripts/aliases-unset) script. The script will quickly unset any aliases for the IAR Build Tools that might have been previously set.
-```
-source ~/bx-docker/scripts/aliases-unset
-```
->:warning: It is recommended to invoke [aliases-unset](scripts/aliases-unset) __before__ invoking [aliases-set](scripts/aliases-set) for when switching from one active `<package>`-`<version>` to another.
-
-### Setting new aliases
+ 
+The [aliases-set](scripts/aliases-set) script is a general solution to make the usage of the IAR Build Tools seamless. These aliases bind the host's current directory (`$PWD`) to the container's `/build` directory. When relying on these aliases, it is recommended to invoke the tools from the project's __top__ directory (or any level above). That way, the Docker container will have full visibility over all the project's files.
+ 
+### Setting aliases
 The aliases for the IAR Build Tools from existing Docker images are set with the [__aliases-set__](scripts/aliases-set) script, using the following syntax:
 ```
 source ~/bx-docker/scripts/aliases-set <package> <version>
@@ -162,25 +157,33 @@ alias | grep iarsystems
 
 >:warning: The __aliases-set__ script will only set the aliases for the IAR Build Tools if the corresponding Docker image can be found in the host.
 
- ### Sticking with the aliases
-Once we have the Docker images built, we have the option to make aliases settings for a single Docker image __persistent__.
-In order to achieve that, we need to add the desired command that sources [aliases-set](scripts/aliases-set) script into one of the various configuration files that are read when a new bash shell session is launched. 
+### Sticking with the aliases
+Aliases only last for the current bash shell session's lifetime. It is possible to make aliases settings __persistent__.
 
-The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. We just need append the command to set the desired aliases for the chosen `<package>` and `<version>` in __one__ of them. We can perform this change from an editor, or straight from the command line. For example:
+One way of achieving that is to source the [aliases-set](scripts/aliases-set) script whenever a new bash shell is launched. 
+
+The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. With that in mind, the __aliases-set__ script can be sourced while pointing to the desired `iarsystems/bx<package>:<version>` image. 
+ 
+It is possible to perform this change directy from the shell. For example:
 ```
 echo "source ~/bx-docker/scripts/aliases-set <package> <version>" >> ~/.bashrc
 ```
 
-Now, the aliases for running the IAR Build Tools from the chosen Docker Image should always become available when a new bash shell session is launched, unless:
-* The corresponding `iarsystems/bx<package>:<version>` Docker image is inaccessible.
-* The chosen bash configuration file is changed and the command for sourcing the alias is removed.
-* The [aliases-unset](scripts/aliases-unset) is invoked during the current bash session.
-
-The [aliases-set](scripts/aliases-set) script is a general solution to make the usage of the IAR Build Tools seamless. These aliases bind the host's current directory (`$PWD`) to the container's `/build` directory. When relying on these aliases, ut is recommended to invoke the tools from the project's __top__ directory (or any level above). That way, the Docker container will have full visibility over all the project's files.
-
- >:warning: Ultimately, these aliases are __optional__. An user can take them as initial reference for customizing their own code to meet particular requirements. 
-
+Now, the aliases for running the IAR Build Tools from the `iarsystems/bx<package>:<version>` Docker image will be available for new shell sessions, __unless__:
+* The corresponding `iarsystems/bx<package>:<version>` Docker image becomes inaccessible.
+* The bash configuration file that sources the __alias-set__ script was modified and the command has been removed. 
  
+>:warning: Ultimately, these aliases are __optional__. An user can take the [aliases-set](scripts/aliases-set) script as initial reference for any suitable customizations.
+
+### Unsetting aliases
+ In order to unset all the aliases which were set with the [aliases-set](scripts/aliases-set) use:
+```
+source ~/bx-docker/scripts/aliases-unset
+```
+ 
+>:warning: It is considered to be a good practice to always unset previous aliases for the tools before setting aliases for another Docker image. 
+ 
+
 ## Host license configuration
 This section shows how to configure the __license__ on the Host for when using the IAR Build Tools from a Docker container.
 
