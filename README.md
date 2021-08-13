@@ -8,9 +8,9 @@ If you have a question specifically related to this tutorial, you might be inter
 
 If you want to be notifed in your GitHub inbox about significant updates to this tutorial, you can start __watching__ this repository. You can customize which types of notification you want to get. Read more about [notifications](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/setting-up-notifications/about-notifications) and how to [customize](https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/setting-up-notifications/about-notifications#customizing-notifications-and-subscriptions) them.
 
-> __Important:__ 
-> * Before you start the walkthrough, make sure you have a non-root super user account - *a user with __sudo__ privileges* - if you need to install the _Docker Engine_ on the _Ubuntu host_. If you already have the _Docker Engine_ in place, the standard user account has to belong to the __docker__ group. 
-> * _IAR Systems only provides what is considered to be the bare essential information for the completion of this tutorial when it comes to Ubuntu, Linux, Docker, Bash and Git in general. That way, it becomes straightforward for any user willing to follow the steps until the end. Beyond this point, as in production, a proper level of familiarity with these platforms becomes a self-evident pre-requisite._
+>:warning: Before you start the walkthrough, make sure you have a non-root super user account - *a user with __sudo__ privileges* - if you need to install the _Docker Engine_ on the _Ubuntu host_. If you already have the _Docker Engine_ in place, the standard user account has to belong to the __docker__ group. 
+
+>:warning: _IAR Systems only provides what is considered to be the bare essential information for the completion of this tutorial when it comes to Ubuntu, Linux, Docker, Bash and Git in general. That way, it becomes straightforward for any user willing to follow the steps until the end. Beyond this point, as in production, a proper level of familiarity with these platforms becomes a self-evident pre-requisite._
 
 ## Conventions
 As we are going to be dealing with different packages, for different architectures and their respective versions, it unfolds many different possibilites for this tutorial. Establishing some useful conventions becomes convenient.
@@ -44,7 +44,7 @@ sudo apt update && sudo apt install -y \
      gnupg-agent \
      software-properties-common
 ```
-> __Tip__: You can use GitHub's __Copy to clipboard__ feature. A button with a clipboard icon appears on the right side of the command whenever you hover the mouse pointer over the command.
+>:warning: You can use GitHub's __Copy to clipboard__ feature. A button with a clipboard icon appears on the right side of the command whenever you hover the mouse pointer over the command.
 
 Add __Docker's official repository GPG key__ to the package management keyring.
 ```
@@ -109,7 +109,7 @@ __Build__ the Docker image for the desired bx`<package>`-`<version>`.deb using t
 ```
 ~/bx-docker/scripts/build <path-to>/bx<package>-<version>.deb [image-user:[image-group]]
 ```
->__Note:__ The `image-user` and `image-group` parameters are optional. The build script will default to $USER:docker.
+>:warning: The `image-user` and `image-group` parameters are optional. The build script will default to $USER:docker.
 
 The [__build__](scripts/build) script will automatically tag the Docker image to be built as `iarsystems/bx<package>:<version>`.
 
@@ -129,21 +129,16 @@ iarsystems/bxarm                   8.50.6              ad9209426630        About
 
 
 ## Setup Host environment
-In this section, we will take advantage of __bash aliases__ so we can simplify how we run the containerized IAR Build Tools that were installed within the Docker image. Declaring aliases in bash is straightforward. Aliases can last only for the current bash shell session's lifetime.
+In this section, we will take advantage of __bash aliases__ so we can simplify how we run the containerized IAR Build Tools that were installed within the Docker image. 
 
-The general syntax for declaring an alias directly from the command line is:
+The general syntax for declaring an alias in bash is:
 >```
 >alias <alias-name>='<command-to-run>'
 >```
-
-### Unsetting previous aliases
-In order to avoid potential conflicts between aliases for tools from different images, start with the [__aliases-unset__](scripts/aliases-unset) script. The script will quickly unset any aliases for the IAR Build Tools that might have been previously set.
-```
-source ~/bx-docker/scripts/aliases-unset
-```
->__Note:__ It is recommended to invoke [aliases-unset](scripts/aliases-unset) __before__ invoking [aliases-set](scripts/aliases-set) for switching from active `<package>`-`<version>` to another.
-
-### Setting new aliases
+ 
+The [aliases-set](scripts/aliases-set) script is a general solution to make the usage of the IAR Build Tools seamless. These aliases bind the host's current directory (`$PWD`) to the container's `/build` directory. When relying on these aliases, it is recommended to invoke the tools from the project's __top__ directory (or any level above). That way, the Docker container will have full visibility over all the project's files.
+ 
+### Setting aliases
 The aliases for the IAR Build Tools from existing Docker images are set with the [__aliases-set__](scripts/aliases-set) script, using the following syntax:
 ```
 source ~/bx-docker/scripts/aliases-set <package> <version>
@@ -153,8 +148,6 @@ source ~/bx-docker/scripts/aliases-set <package> <version>
 >    .. Using Docker image: iarsystems/bx<package>:<version>.
 > ```
 
-The __aliases-set__ script will only set the aliases for the IAR Build Tools if the corresponding Docker image can be found in the host.
-
 From this point onwards, when any of the IAR Build Tools is invoked, the aliases will take place. The corresponding Docker container for the `iarsystems/bx<package>:<version>` image will be spawned, running the selected tool. When the tool operation is completed, the container is destroyed.
     
 It is possible to __list__ all the IAR Build Tools aliases currently set with the following command:
@@ -162,25 +155,34 @@ It is possible to __list__ all the IAR Build Tools aliases currently set with th
 alias | grep iarsystems 
 ```
 
-### Sticking with the aliases
-Once we have the Docker images built, we have the option to make aliases settings for a single Docker image __persistent__.
-In order to achieve that, we need to add the desired command that sources [aliases-set](scripts/aliases-set) script into one of the various configuration files that are read when a new bash shell session is launched. 
+>:warning: The __aliases-set__ script will only set the aliases for the IAR Build Tools if the corresponding Docker image can be found in the host.
 
-The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. We just need append the command to set the desired aliases for the chosen `<package>` and `<version>` in __one__ of them. We can perform this change from an editor, or straight from the command line. For example:
+### Sticking with the aliases
+Aliases only last for the current bash shell session's lifetime. It is possible to make aliases settings __persistent__.
+
+One way of achieving that is to source the [aliases-set](scripts/aliases-set) script whenever a new bash shell is launched. 
+
+The files that the bash shell reads when a session launches are, in general, `~/.bashrc` and `~/.bash_profile`. With that in mind, the __aliases-set__ script can be sourced while pointing to the desired `iarsystems/bx<package>:<version>` image. The command `source <path-to>/aliases-set <package> <version>` should be appended to the desired bash configuration file.
+ 
+It is possible to perform this change directy from the shell. For example:
 ```
 echo "source ~/bx-docker/scripts/aliases-set <package> <version>" >> ~/.bashrc
 ```
 
-Now, the aliases for running the IAR Build Tools from the chosen Docker Image should always become available when a new bash shell session is launched, unless:
-* The corresponding `iarsystems/bx<package>:<version>` Docker image is inaccessible.
-* The chosen bash configuration file is changed and the command for sourcing the alias is removed.
-* The [aliases-unset](scripts/aliases-unset) is invoked during the current bash session.
+Now, the aliases for running the IAR Build Tools from the `iarsystems/bx<package>:<version>` Docker image will be available for new shell sessions, __unless__:
+* The corresponding `iarsystems/bx<package>:<version>` Docker image becomes inaccessible.
+* The bash configuration file that sources the __aliases-set__ script was modified and the command has been removed. 
+ 
+>:warning: Ultimately, these aliases are __optional__. An user can take the [aliases-set](scripts/aliases-set) script as initial reference for any suitable customizations.
 
-> __Important__
-> * The [aliases-set](scripts/aliases-set) script is a general solution to make the usage of the IAR Build Tools seamless.
-> * These aliases bind the host's current directory (`$PWD`) to the container's `/build` directory. 
-> * It is recommended to invoke the tools from the project's __top__ directory (or any level above). That way, the Docker container will have full visibility over all the project's files.
-> * Ultimately, these aliases are __optional__ as any user can take them as reference for customizing their own code to meet particular requirements. 
+### Unsetting aliases
+ In order to unset all the aliases which were set with the [aliases-set](scripts/aliases-set) use:
+```
+source ~/bx-docker/scripts/aliases-unset
+```
+ 
+>:warning: It is considered to be a good practice to always unset previous aliases for the tools before setting aliases for another Docker image. 
+ 
 
 ## Host license configuration
 This section shows how to configure the __license__ on the Host for when using the IAR Build Tools from a Docker container.
@@ -226,10 +228,11 @@ icc<arch> --version
 
 The IAR Build Tools are now __ready to use__.
 
-> __Notes__
-> * It is possible to customize the `IAR_LMS_SETTINGS_DIR` environment variable to point a different location. The location does not necessarily need to belong to the _build tools user_, but requires read/write/execute (`rwx`) access permissions. If the chosen location is volatile, such as `/tmp/.lms`, the Host license setup will need to be run every time after the Host reboots.
-> * There are cases where a Firewall could be preventing the Host from reaching the IAR License Server. IAR Systems provides a [__Tech Note__][lms-port-url] covering such cases.
-> * Access the [__Installation and Licensing User Guide for Linux__][ug-lms2-lx-1-url] for more information.
+>:warning: It is possible to customize the `IAR_LMS_SETTINGS_DIR` environment variable to point a different location. The location does not necessarily need to belong to the _build tools user_, but requires read/write/execute (`rwx`) access permissions. If the chosen location is volatile, such as `/tmp/.lms`, the Host license setup will need to be run every time after the Host reboots.
+ 
+>:warning: There are cases where a Firewall could be preventing the Host from reaching the IAR License Server. IAR Systems provides a [__Tech Note__][lms-port-url] covering such cases.
+ 
+>:warning: Access the [__Installation and Licensing User Guide for Linux__][ug-lms2-lx-1-url] for more information.
 
 [ug-lms2-lx-1-url]: https://netstorage.iar.com/SuppDB/Public/UPDINFO/014853/common/doc/lightlicensemanager/UserGuide_LMS2_LX.ENU.pdf
 
@@ -244,6 +247,12 @@ Simplified syntax:
 ```
 iarbuild <relative-path-to>/<project>.ewp [command] <build-configuration> [-parallel <cpu-cores>] [other-options]
 ```
+ 
+The __`[command]`__ parameter is __optional__. If ommited, it will default to `-make`. Other commands commonly used when build projects are `-build` or `-clean`.
+
+The __`<build-configuration>`__ parameter is __mandatory__. Typically it will be `Debug` or `Release`. This parameter accepts multiple comma-separated _build configurations_ such as `Debug,Release[,MyAnotherCustomBuildConfiguration,...]`. Ultimately this parameter accepts the __` * `__ as wildcard. The wildcard will address all the _build configurations_ in the `<project>`.
+
+The __`-parallel <cpu-cores>`__ parameter is __optional__. It can significantly reduce the required time for building when the host PC has 2 or more CPU cores.
 
 For example, to __build__ using the _"Debug" build configuration_ from the `c-stat.ewp` project, paste the corresponding command from the table below for the `<arch>` in use.
 | `<arch>`  | __Command__ |
@@ -254,11 +263,7 @@ For example, to __build__ using the _"Debug" build configuration_ from the `c-st
 | `rl78`    | `iarbuild bx-docker/projects/rl78/c-stat.ewp "Debug"`      |
 | `rx`      | `iarbuild bx-docker/projects/rx/c-stat.ewp "Debug"`        |
 
-> __Notes__
-> * The __`[command]`__ parameter is __optional__. If ommited, it will default to `-make`. Other commands commonly used when build projects are `-build` or `-clean`.
-> * The __`<build-configuration>`__ parameter is __mandatory__. Typically it will be `Debug` or `Release`. This parameter accepts multiple comma-separated _build configurations_ such as `Debug,Release[,MyAnotherCustomBuildConfiguration,...]`. Ultimately this parameter accepts the __` * `__ as wildcard. The wildcard will address all the _build configurations_ in the `<project>`.
-> * The __`-parallel <cpu-cores>`__ parameter is __optional__. It can significantly reduce the required time for building when the host PC has 2 or more CPU cores.
-> * Invoke `iarbuild` with no parameters for a more extensive description on its parameter options.
+>:warning: Invoke `iarbuild` with no parameters for a more extensive description on its parameter options.
 
 ### Static Code Analysis 
 With `iarbuild`, it is also possible to perform static code analysis with [C-STAT](https://www.iar.com/cstat) on any existing `<build-configuration>` in an `.ewp` file.
@@ -296,7 +301,8 @@ The output will be similar to:
 > ```
 > HTML report generated: bx-docker/projects/<arch>/c-stat.ewp.html
 > ```
-> __Note:__ When used in conjunction with `iarbuild`, [C-STAT](https://www.iar.com/cstat) will look for a file named `<project>.ewt` in the `<project>`'s folder. This file is automatically generated by the __IAR Embedded Workbench IDE__ when rulesets other than its _Standard Checks_ were selected a `<build-configuration>`. 
+ 
+>:warning: When used in conjunction with `iarbuild`, [C-STAT](https://www.iar.com/cstat) will look for a file named `<project>.ewt` in the `<project>`'s folder. This file is automatically generated by the __IAR Embedded Workbench IDE__ when rulesets other than its _Standard Checks_ were selected a `<build-configuration>`. 
 
 ### Running interactive containers
 The [__aliases-set__](scripts/aliases-set) script brings the `bx<package>-docker-interactive` alias to spawn a container in _interactive mode_:
