@@ -78,6 +78,9 @@ RUN  mkdir -p ${IAR_LMS_SETTINGS_DIR} && \
 # Set the user mask to allow group to write
 RUN  echo "umask 002" >> /home/iaruser/.bashrc
 
+# Allow the user to sudo without password
+RUN  sed -i '$ a iaruser     ALL=(ALL) NOPASSWD:ALL' /etc/sudoers
+
 # Setup the initial user and work directory for the image
 USER iaruser 
 WORKDIR ${IAR_BUILD_PATH}
