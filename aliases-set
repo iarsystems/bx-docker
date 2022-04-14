@@ -1,0 +1,81 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2020-2022 IAR Systems AB
+#
+# aliases-set
+#
+# Set aliases for IAR Build Tools Docker images
+#
+# See LICENSE for detailed license information
+#
+
+function _bx_show_help() 
+{
+  echo "Usage: source ${BASH_SOURCE[0]} CONTAINER_ID" 
+  echo " "  
+}
+
+# Aliases for the arm/bin executables
+function _bx-aliases-set() 
+{
+  if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
+    echo "ERROR: the script is not being properly sourced." >&2
+    _bx_show_help
+    return 1
+  fi
+  
+  if [ $# -ne 1 ]; then
+    _bx_show_help
+    return 1
+  fi
+
+  CONTAINER_ID=$1
+
+  # Find Build Tools
+  PACKAGE_DIR=$(docker exec ${CONTAINER_ID} find /opt/iarsystems -type l)
+  IMAGE_PACKAGE=${PACKAGE_DIR#/opt/iarsystems/bx}
+  
+  # Base exec command
+  local DOCKER_EXEC_BASE=$(printf "alias bx-exec='docker exec --user `id -u`:`id -g` ${CONTAINER_ID}'")
+  eval ${DOCKER_EXEC_BASE}
+  # <arch> execs
+  local IASMARCH=$(printf "alias iasm${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iasm${IMAGE_PACKAGE%fs}'")
+  eval ${IASMARCH}
+  local ICCARCH=$(printf "alias icc${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/icc${IMAGE_PACKAGE%fs}'")
+  eval $ICCARCH
+  local IELFDUMPARCH=$(printf "alias ielfdump${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ielfdump${IMAGE_PACKAGE%fs}'")
+  eval $IELFDUMPARCH
+  local ILINKARCH=$(printf "alias ilink${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ilink${IMAGE_PACKAGE%fs}'")
+  eval $ILINKARCH
+  # non-<arch> execs
+  local IARBUILD=$(printf "alias iarbuild='bx-exec ${PACKAGE_DIR}/common/bin/iarbuild'")
+  eval $IARBUILD
+  local IARCHIVE=$(printf "alias iarchive='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iarchive'")
+  eval $IARCHIVE
+  local ICHECKS=$(printf "alias ichecks='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ichecks'")
+  eval $ICHECKS
+  local ICSTAT=$(printf "alias icstat='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/icstat'")
+  eval $ICSTAT
+  local IELFTOOL=$(printf "alias ielftool='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ielftool'")
+  eval $IELFTOOL
+  local IEXE2OBJ=$(printf "alias iexe2obj='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iexe2obj'")
+  eval $IEXE2OBJ
+  local ISYMEXPORT=$(printf "alias isymexport='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/isymexport'")
+  eval $ISYMEXPORT
+  local IOBJMANIP=$(printf "alias iobjmanip='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iobjmanip'")
+  eval $IOBJMANIP
+  local IREPORT=$(printf "alias ireport='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ireport'")
+  eval $IREPORT
+  
+  printf -- "-- The following aliases for IAR Build Tools were set:\n"
+  alias | grep bx-exec
+  printf -- "-- Now it is possible to execute the build tools seamlessly from the Linux machine.\n"
+}
+
+_bx-aliases-set $@
+unset -f _bx-aliases-set
+unset -f _bx_show_help
+
+# Add Bash autocompletion for the IAR command line build utility
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/iarbuild-autocompletion.bash
