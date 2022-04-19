@@ -164,10 +164,10 @@ The analysis results are stored in an SQLite database named __cstat.db__. This d
 
 Then use the following command to generate an analysis report:
 ```
-ireport --full --db <arch>/Release/path/to/cstat.db
+ireport --full --project hello-world --db <arch>/Release/path/to/cstat.db
 ```
 > ```
-> HTML report generated: <arch>/hello-world.ewp.html
+> HTML report generated: hello-world.html
 > ```
 
 >:bulb: Customized ruleset selections for a __`<project>`.ewp__ are automatically stored in a corresponding __`<project>`.ewt__. If the project is under version control, it is advised to check-in this file as well.
