@@ -29,7 +29,7 @@ function _bx-license-setup()
   # Check for any existing Docker volume for the LMS2
   declare -a BX_LMS2_VOLUME=($(docker volume ls | grep LMS2))
   if [ -z ${BX_LMS2_VOLUME} ]; then
-    printf "-- Creating a Docker volume for LMS2..."
+    printf -- "Creating a Docker volume for LMS2...\n"
     docker volume create LMS2
   fi
 
@@ -39,7 +39,7 @@ function _bx-license-setup()
   docker stop bx-license-setup
   docker rm   bx-license-setup
 
-  printf "-- License setup completed."
+  printf -- "License setup completed.\n"
 }
 
 _bx-license-setup $@
