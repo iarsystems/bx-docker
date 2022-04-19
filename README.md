@@ -162,13 +162,20 @@ iarbuild <arch>/hello-world.ewp -cstat_analyze Release
 
 The analysis results are stored in an SQLite database named __cstat.db__. This database can be used for generating an analysis report containing warnings about coding violations for the project's ruleset selection.
 
-Then use the following command to generate an analysis report:
+Use `icstat` to display the warnings on the terminal:
+```
+icstat load --db <arch>/Release/path/to/cstat.db
+```
+
+And then use `ireport` to generate an HTML report:
 ```
 ireport --full --project hello-world --db <arch>/Release/path/to/cstat.db
 ```
 > ```
 > HTML report generated: hello-world.html
 > ```
+
+>:bulb: On terminal, you can use `lynx hello-world.html` to visualize the text content of the HTML report. This report contains graphical elements, so use a Desktop Web Browser to visualize its full contents.
 
 >:bulb: Customized ruleset selections for a __`<project>`.ewp__ are automatically stored in a corresponding __`<project>`.ewt__. If the project is under version control, it is advised to check-in this file as well.
 
