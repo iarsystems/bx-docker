@@ -2,7 +2,7 @@
 
 <workspace>
   <project>
-	  <path>$WS_DIR$/c-stat.ewp</path>
+	  <path>$WS_DIR$/hello-world.ewp</path>
   </project>
   <batchBuild/>
 </workspace>

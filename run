@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2022-2022 IAR Systems AB
+#
+# Run a container with the IAR Build Tools
+#
+# See LICENSE for detailed license information
+#
+
+function _bx_show_help() {
+  echo "Usage: ${BASH_SOURCE[0]} iarsystems/bx<package>:<version>"
+  echo " "
+}
+
+function _bx_run_container()
+{
+  if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
+    echo "ERROR: the script should be executed directly. Do not source." >&2
+    _bx_show_help
+    return 1
+  fi
+  
+  if [ $# -lt 1 ]; then
+    _bx_show_help
+    return 1
+  fi
+  
+  local SCRIPT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
+  local IMAGE_PACKAGE=$( echo ${1} | cut -d/ -f2 | cut -d: -f1 )
+  local IMAGE_VERSION=$( echo ${1} | cut -d: -f2 ) 
+
+  declare -a BX_DOCKER_IMAGES_LIST=( $(docker images --filter "reference=iarsystems/${IMAGE_PACKAGE}:${IMAGE_VERSION}" -q --format "{{.Repository}}:{{.Tag}}" ) )
+
+  if [ -z ${BX_DOCKER_IMAGES_LIST} ]; then
+    echo "Image ${IMAGE_PACKAGE}:${IMAGE_VERSION} not found."
+    return 1
+  fi
+  
+  echo -- Running a Docker container for ${IMAGE_PACKAGE,,}-${IMAGE_VERSION}...
+  CONTAINER_ID=$( docker run --detach \
+	                     --hostname `hostname` \
+	                     --tty \
+	                     --volume LMS2:/usr/local/etc/IARSystems \
+	                     --volume /etc/timezone:/etc/timezone:ro \
+                             --volume /etc/localtime:/etc/localtime:ro \
+	                     --volume `pwd`:/build \
+	                     ${1})
+
+  echo "-- The working directory is `pwd`."
+  echo " "
+  echo -- Now source the aliases-set script:
+  echo    . ${SCRIPT_PATH}/aliases-set ${CONTAINER_ID}
+}
+
+_bx_run_container $@
+unset -f _bx_run_container
+unset -f _bx_show_help
