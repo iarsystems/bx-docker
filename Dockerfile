@@ -21,7 +21,7 @@ ENV  LC_ALL=C \
 #
 # Copy from the Docker context to /tmp
 #
-COPY ${PKG_FILE} /tmp
+COPY bx*.deb /tmp
 
 #
 # Install the necessary packages and cleanup
@@ -32,7 +32,7 @@ COPY ${PKG_FILE} /tmp
 RUN  apt-get update && \
      apt-get install -y sudo libsqlite3-0 libxml2 tzdata /tmp/bx*.deb && \
      apt-get clean autoclean autoremove && \
-     rm -rf /var/lib/apt/lists/* 
+     rm -rf /var/lib/apt/lists/* /tmp/*.deb
 
 #
 # Set the default Working directory for the image
