@@ -42,8 +42,6 @@ function _bx_run_container()
 	                     --hostname `hostname` \
 	                     --tty \
 	                     --volume LMS2:/usr/local/etc/IARSystems \
-	                     --volume /etc/timezone:/etc/timezone:ro \
-                             --volume /etc/localtime:/etc/localtime:ro \
 	                     --volume `pwd`:/build \
 	                     ${1})
 
