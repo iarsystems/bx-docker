@@ -15,7 +15,6 @@ function _bx_show_help()
   echo " "  
 }
 
-
 function _bx-license-setup() 
 {
   if [ $# -ne 2 ]; then
@@ -23,26 +22,21 @@ function _bx-license-setup()
     return 1
   fi
   
-  # Check for reachable LMS2 License Server
-
-
   # Check for any existing Docker volume for the LMS2
   declare -a BX_LMS2_VOLUME=($(docker volume ls | grep LMS2))
   if [ -z ${BX_LMS2_VOLUME} ]; then
-    printf -- "Creating a Docker volume for LMS2...\n"
+    printf -- "setup-license: Creating a Docker volume for LMS2...\n"
     docker volume create LMS2
   fi
 
-
-  docker run  --detach --tty --volume LMS2:/usr/local/etc/IARSystems --name bx-license-setup ${1}
+  # Use the LLM provided by the image for performing the license setup
+  docker run  --rm --detach --tty --volume LMS2:/usr/local/etc/IARSystems --name bx-license-setup ${1}
   docker exec bx-license-setup /opt/iarsystems/bxarm/common/bin/lightlicensemanager setup -s ${2}
   docker stop bx-license-setup
-  docker rm   bx-license-setup
 
-  printf -- "License setup completed.\n"
+  printf -- "setup-license: LMS2 license setup completed.\n"
 }
 
 _bx-license-setup $@
 unset -f _bx-license-setup
 unset -f _bx_show_help
-
