@@ -20,7 +20,7 @@ For completing this tutorial you are going to need:
    - >:bulb: Feel free to [__contact us__][url-iar-contact] if you would like to learn how to get access to the installers.
 - A recent __x86_64/amd64__ Linux machine
    - connected to the Internet,
-   - with an user account with super-user privileges (`sudo`) for installing and using the Docker Engine, or if the account is not on the __docker__ group.
+   - with the Docker Engine installed.
 - An [__IAR LMS2 License Server__](https://links.iar.com/lms2-server)
    - with activated license(s) for the product in the __.deb__ package,
    - reachable from the Linux machine.
@@ -40,20 +40,6 @@ Consider the following examples:
 | bx**arm**-**9.20.4**.deb           | IAR Build Tools for Arm<br/>version 9.20.4    | `<arch>`=`arm`<br/>`<package>`=`arm`<br/>`<version>`=`9.20.4` |
 | bx**armfs**-**8.50.10.35167**.deb  | IAR Build Tools for Arm<br/>[Functional Safety Edition][url-iar-fs]<br/>version 8.50.10.35167 | `<arch>`=`arm`<br/>`<package>`=`armfs`<br/>`<version>`=`8.50.10.35167` |
 | bx**riscv**-**3.10.1**.deb         | IAR Build Tools for RISC-V<br/>version 3.10.1 | `<arch>`=`riscv`<br/>`<package>`=`riscv`<br/>`<version>`=`3.10.1` |
-
-
-## Installing Docker
-For installing the Docker Engine on the Linux machine, follow the [official instructions][url-docker-docs-install]. 
-
-__Alternatively__, Docker provides a "convenience shell script" which can automate the process. Launch a bash shell and execute the following commands:
-```
-curl -fsSL https://get.docker.com -o get-docker.sh
-```
-```
-DRY_RUN=1 sh ./get-docker.sh
-```
-
->:bulb: Verify the __get-docker.sh__ script commands and, if you are satisfied, execute it once more without `DRY_RUN=1` to install the Docker Engine.
 
 
 ## Building a Docker image
