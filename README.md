@@ -20,7 +20,7 @@ For completing this tutorial you are going to need:
    - >:bulb: Feel free to [__contact us__][url-iar-contact] if you would like to learn how to get access to the installers.
 - A recent __x86_64/amd64__ Linux machine
    - connected to the Internet,
-   - with the Docker Engine installed.
+   - with the [Docker Engine installed][url-docker-docs-install].
 - An [__IAR LMS2 License Server__](https://links.iar.com/lms2-server)
    - with activated license(s) for the product in the __.deb__ package,
    - reachable from the Linux machine.
