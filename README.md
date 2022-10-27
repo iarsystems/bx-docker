@@ -126,6 +126,9 @@ Execute:
 ```
 
 Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`pwd`). That way, these containers cannot access any parent directories. Make sure to always run a container from the project's top-directory from which all the project's files are accessible.
+
+Follow the instructions provided by the __`run`__ script output for sourcing the __`aliases-set`__ script.
+
 >:bulb: Use `docker run --help` for more information.
 
 
