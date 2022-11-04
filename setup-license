@@ -4,15 +4,15 @@
 # Copyright (c) 2020-2022 IAR Systems AB
 #
 # setup-license 
-#   Automates the configuration of the IAR Build Tools Docker images
+#   License configuration for the bx-docker images
 #
 # See LICENSE for detailed license information
 #
 
-function _bx_show_help() 
+function _bx_show_help()
 {
-  echo "Usage: ${BASH_SOURCE[0]} <tagname:version> LMS2.server.corp.com" 
-  echo " "  
+  echo "Usage: ${BASH_SOURCE[0]} <tagname:version> LMS2.server.corp.com"
+  echo " "
 }
 
 function _bx-license-setup() 
@@ -22,16 +22,17 @@ function _bx-license-setup()
     return 1
   fi
   
-  # Check for any existing Docker volume for the LMS2
+  # Check for any existing LMS2 Docker Volume
   declare -a BX_LMS2_VOLUME=($(docker volume ls | grep LMS2))
   if [ -z ${BX_LMS2_VOLUME} ]; then
     printf -- "setup-license: Creating a Docker volume for LMS2...\n"
     docker volume create LMS2
   fi
 
-  # Use the LLM provided by the image for performing the license setup
+  # Use the image's provided LLM for initial license setup-license
   docker run  --rm --detach --tty --volume LMS2:/usr/local/etc/IARSystems --name bx-license-setup ${1}
-  docker exec bx-license-setup /opt/iarsystems/bxarm/common/bin/lightlicensemanager setup -s ${2}
+  PACKAGE_DIR=$(docker exec bx-license-setup find /opt/iarsystems -type l)
+  docker exec bx-license-setup ${PACKAGE_DIR}/common/bin/lightlicensemanager setup -s ${2}
   docker stop bx-license-setup
 
   printf -- "setup-license: LMS2 license setup completed.\n"
