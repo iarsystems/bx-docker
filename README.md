@@ -18,8 +18,10 @@ For completing this tutorial you are going to need:
 - An [__IAR Build Tools__][url-iar-bx] installer package
    - in the __.deb__ format.
    - >:bulb: Feel free to [__contact us__][url-iar-contact] if you would like to learn how to get access to the installers.
-- A recent __x86_64/amd64__ Linux machine
+- A recent __x86_64/amd64__ machine
+   - with Ubuntu 18+ (or Debian 10+, or Fedora 35+, ...), or Windows 10 21H1+ (build 19043), and
    - connected to the Internet.
+   - >:bulb: in this tutorial, this machine will be referred as `DOCKER_HOST`.
 - An [__IAR LMS2 License Server__](https://links.iar.com/lms2-server)
    - with activated license(s) for the product in the __.deb__ package,
    - reachable from the Linux machine.
@@ -42,22 +44,18 @@ Consider the following examples:
 
 
 ## Installing Docker
-For installing the Docker Engine on the Linux machine, follow the [official instructions][url-docker-docs-install]. 
+For installing the Docker Engine on the `DOCKER_HOST`, follow the [official instructions][url-docker-docs-install].
 
-__Alternatively__, Docker provides a "convenience shell script" which can automate the process. Launch a bash shell and execute the following commands:
-```
-curl -fsSL https://get.docker.com -o get-docker.sh
-```
-```
-DRY_RUN=1 sh ./get-docker.sh
-```
->:bulb: Verify the __get-docker.sh__ script commands and, if you are satisfied, execute it once more without `DRY_RUN=1` to install the Docker Engine.
+Alternatively, the procedure below should work for most `DOCKER_HOST`s:
+| __Linux (Bash)__ | __Windows__ |
+| --------- | ----------- |
+| <pre>curl -fsSL https://get.docker.com -o get-docker.sh<br>sh ./get-docker.sh</pre> | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
 
 In order to execute Docker commands, the current user (`$USER`) must be in the `docker` group. Execute:
-```
-sudo usermod -aG docker $USER
-```
-Then logout and login again for the changes to take effect.
+| __Linux (Bash)__ | __Windows__ |
+| --------- | :-----------: |
+| <pre>sudo usermod -aG docker $USER</pre>Then logout and login again for the changes to take effect. | -NA- |
+
 
 ## Building a Docker image
 Before being able to run a Docker container, we need to have a Docker image containing its required environment. A Dockerfile contains instructions that describe how an image should be built.
@@ -66,15 +64,15 @@ This [__Dockerfile__](Dockerfile) was created as an universal template to build 
 
 The [__`build`__](build) script will use [`docker build ...`][url-docker-docs-build] with the Dockerfile, alongside an installer package (__bx`<package>`-`<version>`.deb__) to create one image.
 
-In order to build the image, clone the [bx-docker][url-repo] repository to the user's home directory (`~`) by executing the following command:
-```
-git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker
-```
+In order to build the image, clone the [bx-docker][url-repo] repository to the user's home directory:
+| __Linux (Bash)__ | __Windows (Powershell)__ |
+| --------- | ----------- |
+| <pre>git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker</pre> | <pre>git clone https://github.com/iarsystems/bx-docker.git $home/bx-docker</pre> |
 
 Then, invoke the __`build`__ script pointing to the installer package:
-```
-~/bx-docker/build /path/to/bx<package>-<version>.deb 
-```
+| __Linux (Bash)__ | __Windows (Powershell)__ |
+| --------- | ----------- |
+| <pre>~/bx-docker/build /path/to/bx<package>-<version>.deb</pre> | <pre>./bx-docker/build /path/to/bx<package>-<version>.deb</pre> |
 
 Depending on your system's characteristics, it might take a while to build the image. This process usually might range from seconds to a few minutes. In the end, the __`build`__ script will automatically tag the image as __iarsystems/bx`<package>`:`<version>`__.
 
@@ -97,9 +95,9 @@ And you will get an output similar to this, depending on the images you've creat
 The IAR Build Tools require an available network license to operate.
 
 In order to set up the license for all the containers in the Linux machine, execute the [__`setup-license`__](setup-license) script pointing to the image's \<tagname:version\> followed by the IAR LMS2 License Server's IP:
-```
-~/bx-docker/setup-license iarsystems/bx<package>:<version> <lms2-server-ip>
-```
+| __Linux (Bash)__ | __Windows (Powershell)__ |
+| --------- | ----------- |
+| <pre>~/bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> | <pre>./bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> |
 
 The __`setup-license`__ script will prepare a [Docker volume][url-docker-docs-volume] which can be shared among all the containers running on the Linux machine for persistent storage of the license configuration.
 
@@ -114,20 +112,16 @@ In this section, we will use the image we created to run a container so that lat
 The [bx-docker][url-repo] repository comes with projects created in the [IAR Embedded Workbench][url-iar-ew] for the supported target architectures. 
 
 Access the [projects](projects) sub-directory:
-```
-cd ~/bx-docker/projects
-```
+| __Linux (Bash)__ | __Windows (Powershell)__ |
+| --------- | ----------- |
+| <pre>cd ~/bx-docker/projects</pre> | <pre>cd ./bx-docker/projects</pre> |
 
-The [__`run`__](run) script will use the [`docker run ...`][url-docker-docs-run] command with all the necessary parameters to run the container. 
-
-Execute:
-```
-~/bx-docker/run iarsystems/bx<package>:<version>
-```
+The [__`run`__](run) script will use the [`docker run ...`][url-docker-docs-run] command with all the necessary parameters to run the container. Execute:
+| __Linux (Bash)__ | __Windows (Powershell)__ |
+| --------- | ----------- |
+| <pre>~/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>Follow the instructions provided by the __`run`__ script output for sourcing the __`aliases-set`__ script. | <pre>../run iarsystems/bx\<package\>:\<version\></pre>The __`aliases-set`__ script is invoked automatically by run and applied to the current shell session. |
 
 Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`pwd`). That way, these containers cannot access any parent directories. Make sure to always run a container from the project's top-directory from which all the project's files are accessible.
-
-Follow the instructions provided by the __`run`__ script output for sourcing the __`aliases-set`__ script.
 
 >:bulb: Use `docker run --help` for more information.
 
@@ -142,10 +136,7 @@ When you spawned the container using the [__`run`__](scripts/run) script, you al
 ### Build the project with __iarbuild__
 The IAR Command Line Build Utility (`iarbuild`) can build (or analyze) a __`<project>`.ewp__.
 
-The simplified `iarbuild` syntax is:
-```
-iarbuild relative/path/to/<project>.ewp [command] <build-cfg>
-```
+The simplified `iarbuild` syntax is: `iarbuild relative/path/to/<project>.ewp [command] <build-cfg>`.
 
 For example, use `iarbuild` with the __`-build <build-cfg>`__ command to build the __hello-world.ewp__ project using the build configuration for "Release": 
 ```
