@@ -1,11 +1,8 @@
 # Powershell
 
-<#
- # Copyright (c) 2022 IAR Systems AB
+<# Copyright (c) 2022 IAR Systems AB
  #
- # run.ps1
- #
- # Run a container with the IAR Build Tools
+ # run.ps1 - Run a container with the IAR Build Tools
  # 
  # See LICENSE for detailed license information
  #>
@@ -38,4 +35,8 @@ $ContainerID = docker run --detach `
 
 Write-Output "-- The working directory is $CurrentLocation."
 Write-Output " "
-Write-Output "-- Now execute the aliases-set.ps1 script."
+
+$ImageAliases = "$ScriptPath\aliases-set.ps1"
+$args = @()
+$args += $ContainerID
+Invoke-Expression "$ImageAliases $args"
