@@ -54,7 +54,7 @@ Alternatively, the procedure below should work for most `DOCKER_HOST`s:
 In order to execute Docker commands, the current user (`$USER`) must be in the `docker` group. Execute:
 | __Linux (Bash)__ | __Windows__ |
 | --------- | :-----------: |
-| <pre>sudo usermod -aG docker $USER</pre><br>Then logout and login again for the changes to take effect. | -NA- |
+| <pre>sudo usermod -aG docker $USER</pre>Then logout and login again for the changes to take effect. | -NA- |
 
 
 ## Building a Docker image
@@ -116,9 +116,7 @@ Access the [projects](projects) sub-directory:
 | --------- | ----------- |
 | <pre>cd ~/bx-docker/projects</pre> | <pre>cd $home/bx-docker/projects</pre> |
 
-The [__`run`__](run) script will use the [`docker run ...`][url-docker-docs-run] command with all the necessary parameters to run the container. 
-
-Execute:
+The [__`run`__](run) script will use the [`docker run ...`][url-docker-docs-run] command with all the necessary parameters to run the container. Execute:
 | __Linux (Bash)__ | __Windows (Powershell)__ |
 | --------- | ----------- |
 | <pre>~/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>Follow the instructions provided by the __`run`__ script output for sourcing the __`aliases-set`__ script. | <pre>$home/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>The __`aliases-set`__ script is invoked automatically by run and applied to the current shell session. |
