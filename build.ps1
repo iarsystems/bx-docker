@@ -1,11 +1,8 @@
 # Powershell
 
-<#
- # Copyright (c) 2022 IAR Systems AB
+<# Copyright (c) 2022 IAR Systems AB
  #
- # build.ps1
- #
- # Build a Docker image containing the IAR Build Tools
+ # build.ps1 - Build a Docker image containing the IAR Build Tools
  # 
  # See LICENSE for detailed license information
  #>
@@ -52,3 +49,4 @@ docker build --tag iarsystems/$PkgName\:$PkgVersion $ScriptPath
 
 # Cleanup
 Write-Output "Removing $ScriptPath/$PkgFile..."
+Remove-Item $ScriptPath/$PkgFile
