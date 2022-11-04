@@ -136,10 +136,7 @@ When you spawned the container using the [__`run`__](scripts/run) script, you al
 ### Build the project with __iarbuild__
 The IAR Command Line Build Utility (`iarbuild`) can build (or analyze) a __`<project>`.ewp__.
 
-The simplified `iarbuild` syntax is:
-```
-iarbuild relative/path/to/<project>.ewp [command] <build-cfg>
-```
+The simplified `iarbuild` syntax is: `iarbuild relative/path/to/<project>.ewp [command] <build-cfg>`.
 
 For example, use `iarbuild` with the __`-build <build-cfg>`__ command to build the __hello-world.ewp__ project using the build configuration for "Release": 
 ```
