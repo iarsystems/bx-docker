@@ -72,7 +72,7 @@ In order to build the image, clone the [bx-docker][url-repo] repository to the u
 Then, invoke the __`build`__ script pointing to the installer package:
 | __Linux (Bash)__ | __Windows (Powershell)__ |
 | --------- | ----------- |
-| <pre>~/bx-docker/build /path/to/bx<package>-<version>.deb</pre> | <pre>$home/bx-docker/build /path/to/bx<package>-<version>.deb</pre> |
+| <pre>~/bx-docker/build /path/to/bx<package>-<version>.deb</pre> | <pre>./bx-docker/build /path/to/bx<package>-<version>.deb</pre> |
 
 Depending on your system's characteristics, it might take a while to build the image. This process usually might range from seconds to a few minutes. In the end, the __`build`__ script will automatically tag the image as __iarsystems/bx`<package>`:`<version>`__.
 
@@ -97,7 +97,7 @@ The IAR Build Tools require an available network license to operate.
 In order to set up the license for all the containers in the Linux machine, execute the [__`setup-license`__](setup-license) script pointing to the image's \<tagname:version\> followed by the IAR LMS2 License Server's IP:
 | __Linux (Bash)__ | __Windows (Powershell)__ |
 | --------- | ----------- |
-| <pre>~/bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> | <pre>$home/bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> |
+| <pre>~/bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> | <pre>./bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> |
 
 The __`setup-license`__ script will prepare a [Docker volume][url-docker-docs-volume] which can be shared among all the containers running on the Linux machine for persistent storage of the license configuration.
 
@@ -114,12 +114,12 @@ The [bx-docker][url-repo] repository comes with projects created in the [IAR Emb
 Access the [projects](projects) sub-directory:
 | __Linux (Bash)__ | __Windows (Powershell)__ |
 | --------- | ----------- |
-| <pre>cd ~/bx-docker/projects</pre> | <pre>cd $home/bx-docker/projects</pre> |
+| <pre>cd ~/bx-docker/projects</pre> | <pre>cd ./bx-docker/projects</pre> |
 
 The [__`run`__](run) script will use the [`docker run ...`][url-docker-docs-run] command with all the necessary parameters to run the container. Execute:
 | __Linux (Bash)__ | __Windows (Powershell)__ |
 | --------- | ----------- |
-| <pre>~/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>Follow the instructions provided by the __`run`__ script output for sourcing the __`aliases-set`__ script. | <pre>$home/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>The __`aliases-set`__ script is invoked automatically by run and applied to the current shell session. |
+| <pre>~/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>Follow the instructions provided by the __`run`__ script output for sourcing the __`aliases-set`__ script. | <pre>../run iarsystems/bx\<package\>:\<version\></pre>The __`aliases-set`__ script is invoked automatically by run and applied to the current shell session. |
 
 Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`pwd`). That way, these containers cannot access any parent directories. Make sure to always run a container from the project's top-directory from which all the project's files are accessible.
 
