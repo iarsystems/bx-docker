@@ -24,7 +24,7 @@ For completing this tutorial you are going to need:
    - >:bulb: in this tutorial, this machine will be referred as `DOCKER_HOST`.
 - An [__IAR LMS2 License Server__](https://links.iar.com/lms2-server)
    - with activated license(s) for the product in the __.deb__ package,
-   - reachable from the Linux machine.
+   - reachable from the `DOCKER_HOST`.
 
 
 ## Conventions
@@ -94,16 +94,16 @@ And you will get an output similar to this, depending on the images you've creat
 ## Setting up the license
 The IAR Build Tools require an available network license to operate.
 
-In order to set up the license for all the containers in the Linux machine, execute the [__`setup-license`__](setup-license) script pointing to the image's \<tagname:version\> followed by the IAR LMS2 License Server's IP:
+In order to set up the license for all the containers in the `DOCKER_HOST`, execute the [__`setup-license`__](setup-license) script pointing to the image's \<tagname:version\> followed by the IAR LMS2 License Server's IP:
 | __Linux (Bash)__ | __Windows (Powershell)__ |
 | --------- | ----------- |
 | <pre>~/bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> | <pre>./bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> |
 
-The __`setup-license`__ script will prepare a [Docker volume][url-docker-docs-volume] which can be shared among all the containers running on the Linux machine for persistent storage of the license configuration.
+The __`setup-license`__ script will prepare a [Docker volume][url-docker-docs-volume] which can be shared among all the containers running on the `DOCKER_HOST` for persistent storage of the license configuration.
 
 >:bulb: This step must be performed only once. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed.
 
->:bulb: If your network has multiple build nodes (Linux machines), __`setup-license`__ must be performed __individually__ on all of them.
+>:bulb: If your network has multiple build nodes (`DOCKER_HOST`s), __`setup-license`__ must be performed __individually__ on all of them.
 
 
 ## Running a container
@@ -129,7 +129,7 @@ Containers spawned by the __`run`__ script will bind mount the current directory
 ## Executing the Build Tools
 The [`docker exec ...`][url-docker-docs-exec] command can execute a command in a running container. Oftentimes, these command lines might become too long for typing every single time.
 
-When you spawned the container using the [__`run`__](scripts/run) script, you also got [bash aliases](https://en.wikipedia.org/wiki/Alias_%28command%29) set for all the IAR Build Tools from the image you have selected to work with. These aliases encapsulated the required `docker exec ...` commands in such a way that the Linux machine can now execute all the IAR Build Tools seamlessly.
+When you spawned the container using the [__`run`__](scripts/run) script, you also got [bash aliases](https://en.wikipedia.org/wiki/Alias_%28command%29) set for all the IAR Build Tools from the image you have selected to work with. These aliases encapsulated the required `docker exec ...` commands in such a way that the `DOCKER_HOST` can now execute all the IAR Build Tools seamlessly.
 
 >:bulb: Use `docker exec --help` for more information.
 
