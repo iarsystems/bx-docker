@@ -2,7 +2,7 @@
 
 [Docker][url-docker-gs] is generally recognized as best practice to achieve automatically reproducible build environments. It provides means for containerizing self-sufficient build environments resulting from the requirements described in a Dockerfile.
 
-This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provide means for building embedded applications with the [IAR Build Tools][url-iar-bx] from a [container][url-docker-container].
+This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provide means for building embedded applications with the [IAR Build Tools][url-iar-bx] from a Linux [container][url-docker-container].
 
 >:warning: It is recommended to follow this tutorial on a test environment.
 
@@ -50,6 +50,8 @@ Alternatively, the procedure below should work for most `DOCKER_HOST`s:
 | __Linux (Bash)__ | __Windows__ |
 | --------- | ----------- |
 | <pre>curl -fsSL https://get.docker.com -o get-docker.sh<br>sh ./get-docker.sh</pre> | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
+
+>:bulb: On Windows hosts, make sure that Docker Desktop is set for running Linux Containers (default).
 
 In order to execute Docker commands, the current user (`$USER`) must be in the `docker` group. Execute:
 | __Linux (Bash)__ | __Windows__ |
