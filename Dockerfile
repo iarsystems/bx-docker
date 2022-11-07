@@ -7,10 +7,11 @@
 #
 
 #
-# Base image layer 
-#   The IAR Build Tools typically supports Ubuntu 18.04 or Ubuntu 20.04
+# The layer for the IAR Build Tools for Linux
+#  - 2022Q3+ toolchain: Ubuntu 20.04 (*default)
+#  - earlier toolchain: Ubuntu 18.04
 #
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 #
 # Environment variables
