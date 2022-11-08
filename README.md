@@ -123,7 +123,7 @@ The [__`run`__](run) script will use the [`docker run ...`][url-docker-docs-run]
 | --------- | ----------- |
 | <pre>~/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>Follow the instructions provided by the __`run`__ script output for sourcing the __`aliases-set`__ script. | <pre>../run iarsystems/bx\<package\>:\<version\></pre>The __`aliases-set`__ script is invoked automatically by run and applied to the current shell session. |
 
-Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`pwd`). That way, these containers cannot access any parent directories. Make sure to always run a container from the project's top-directory from which all the project's files are accessible.
+Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`/build`). That way, these containers cannot access any parent directories. Make sure to always run a container from the project's top-directory from which all the project's files are accessible.
 
 >:bulb: Use `docker run --help` for more information.
 
