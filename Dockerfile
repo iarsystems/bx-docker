@@ -7,7 +7,7 @@
 #
 
 #
-# The layer for the IAR Build Tools for Linux
+# The base layer for the bx-docker image
 #  - 2022Q3+ toolchain: Ubuntu 20.04 (*default)
 #  - earlier toolchain: Ubuntu 18.04
 #
