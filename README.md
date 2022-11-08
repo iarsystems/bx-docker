@@ -186,7 +186,7 @@ Found an issue or have a suggestion related to the [__bx-docker__][url-repo] tut
 
 
 ## Summary
-And that is how the [IAR Build Tools][url-iar-bx] can run in containers.
+And that is how the [IAR Build Tools][url-iar-bx] can run on Linux containers.
    
 Now you can learn from the scripts, from the [Dockerfile](Dockerfile) and from the official [Docker Documentation][url-docker-docs] which together sum up as a cornerstone for your organization to use as it is or to customize them so that the containers run in suitable ways for particular needs.
 
