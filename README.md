@@ -174,7 +174,7 @@ ireport --full --project hello-world --db <arch>/Release/path/to/cstat.db
 > HTML report generated: hello-world.html
 > ```
 
->:bulb: On terminal, you can use `lynx hello-world.html` to visualize the text content of the HTML report. This report contains graphical elements, so use a Desktop Web Browser to visualize its full contents.
+>:bulb: On the Linux Bash shell, you can use `lynx hello-world.html` to visualize the text content of the HTML report. This report contains graphical elements, so use a Desktop Web Browser to visualize its full contents.
 
 >:bulb: Customized ruleset selections for a __`<project>`.ewp__ are automatically stored in a corresponding __`<project>`.ewt__. If the project is under version control, it is advised to check-in this file as well.
 
