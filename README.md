@@ -190,7 +190,7 @@ And that is how the [IAR Build Tools][url-iar-bx] can run on Linux containers.
    
 Now you can learn from the scripts, from the [Dockerfile](Dockerfile) and from the official [Docker Documentation][url-docker-docs] which together sum up as a cornerstone for your organization to use as it is or to customize them so that the containers run in suitable ways for particular needs.
 
-[Here][url-iar-bx] you can find additional resources such as on-demand webinars about the IAR Build Tools within automated workflows scenarios.
+<!-- [Here][url-iar-bx] you can find additional resources such as on-demand webinars about the IAR Build Tools within automated workflows scenarios. -->
 
    
 <!-- Links -->
