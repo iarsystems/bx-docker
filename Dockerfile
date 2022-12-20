@@ -15,9 +15,12 @@ FROM ubuntu:20.04
 
 #
 # Environment variables
+# bx-docker - issue #22 - starting from bxarm-9.30.1, iarbuild tries to create $HOME/.iar.
+#                         For the Ubuntu 20.04 container, $HOME must be manually set.
 #
 ENV  LC_ALL=C \
-     DEBIAN_FRONTEND="noninteractive"
+     DEBIAN_FRONTEND="noninteractive" \
+     HOME=/build
 
 #
 # Copy from the Docker context to /tmp
@@ -38,5 +41,4 @@ RUN  apt-get update && \
 #
 # Set the default Working directory for the image
 #
-WORKDIR /build
-
+WORKDIR ${HOME}
