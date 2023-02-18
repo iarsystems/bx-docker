@@ -8,8 +8,8 @@ This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provid
 
 
 ## Disclaimer
-The information in this repository is subject to change without notice and does not represent a commitment on any part of IAR Systems. While the information contained 
-herein is assumed to be accurate, IAR Systems assumes no responsibility for any errors or omissions.
+The information in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained 
+herein is assumed to be accurate, IAR assumes no responsibility for any errors or omissions.
 
 
 ## Pre-requisites
