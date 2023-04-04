@@ -36,35 +36,54 @@ function _bx-aliases-set()
   PACKAGE_DIR=$(docker exec ${CONTAINER_ID} find /opt/iarsystems -type l)
   IMAGE_PACKAGE=${PACKAGE_DIR#/opt/iarsystems/bx}
   
-  # Base exec command
+
+    # Base exec command
   local DOCKER_EXEC_BASE=$(printf "alias bx-exec='docker exec --user `id -u`:`id -g` ${CONTAINER_ID}'")
   eval ${DOCKER_EXEC_BASE}
-  # <arch> execs
-  local IASMARCH=$(printf "alias iasm${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iasm${IMAGE_PACKAGE%fs}'")
-  eval ${IASMARCH}
+
   local ICCARCH=$(printf "alias icc${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/icc${IMAGE_PACKAGE%fs}'")
   eval $ICCARCH
-  local IELFDUMPARCH=$(printf "alias ielfdump${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ielfdump${IMAGE_PACKAGE%fs}'")
-  eval $IELFDUMPARCH
-  local ILINKARCH=$(printf "alias ilink${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ilink${IMAGE_PACKAGE%fs}'")
-  eval $ILINKARCH
+
+  case ${IMAGE_PACKAGE^^} in
+    # XLINK
+    BXAVR)
+      local AARCH=$(printf "alias a${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/a${IMAGE_PACKAGE%fs}'")
+      eval ${AARCH}
+      local XLINKARCH=$(printf "alias xlink${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/xlink${IMAGE_PACKAGE%fs}'")
+      eval $XLINKARCH
+      local XAR=$(printf "alias xar='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/xar'")
+      eval $XAR
+
+    # ILINK, everything else
+    *)
+      local IASMARCH=$(printf "alias iasm${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iasm${IMAGE_PACKAGE%fs}'")
+      eval ${IASMARCH}
+      local ILINKARCH=$(printf "alias ilink${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ilink${IMAGE_PACKAGE%fs}'")
+      eval $ILINKARCH
+      local IARCHIVE=$(printf "alias iarchive='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iarchive'")
+      eval $IARCHIVE
+
+      local IELFTOOL=$(printf "alias ielftool='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ielftool'")
+      eval $IELFTOOL
+      local IELFDUMPARCH=$(printf "alias ielfdump${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ielfdump${IMAGE_PACKAGE%fs}'")
+      eval $IELFDUMPARCH
+      local IEXE2OBJ=$(printf "alias iexe2obj='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iexe2obj'")
+      eval $IEXE2OBJ
+      local ISYMEXPORT=$(printf "alias isymexport='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/isymexport'")
+      eval $ISYMEXPORT
+      local IOBJMANIP=$(printf "alias iobjmanip='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iobjmanip'")
+      eval $IOBJMANIP
+  esac
+
   # non-<arch> execs
   local IARBUILD=$(printf "alias iarbuild='bx-exec ${PACKAGE_DIR}/common/bin/iarbuild'")
   eval $IARBUILD
-  local IARCHIVE=$(printf "alias iarchive='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iarchive'")
-  eval $IARCHIVE
+
+  # C-STAT
   local ICHECKS=$(printf "alias ichecks='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ichecks'")
   eval $ICHECKS
   local ICSTAT=$(printf "alias icstat='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/icstat'")
   eval $ICSTAT
-  local IELFTOOL=$(printf "alias ielftool='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ielftool'")
-  eval $IELFTOOL
-  local IEXE2OBJ=$(printf "alias iexe2obj='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iexe2obj'")
-  eval $IEXE2OBJ
-  local ISYMEXPORT=$(printf "alias isymexport='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/isymexport'")
-  eval $ISYMEXPORT
-  local IOBJMANIP=$(printf "alias iobjmanip='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iobjmanip'")
-  eval $IOBJMANIP
   local IREPORT=$(printf "alias ireport='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/ireport'")
   eval $IREPORT
   
