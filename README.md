@@ -30,8 +30,8 @@ To complete this tutorial you need:
 These naming conventions are used in the tutorial:
 | __Placeholder__ | __Meaning__        | __Valid values__   |
 | :-------------- | :----------------- | :----------------- |
-| `<arch>`        | Architecture       | `arm`, `rh850`, `riscv`, `rl78`, or `rx`                                                  |
-| `<package>`     | Product package    | `arm`, `armfs`, `rh850`, `rh850fs`, `riscv`, `riscvfs`, `rl78`, `rl78fs`, `rx`, or `rxfs` |
+| `<arch>`        | Architecture       | `arm`, `avr`, `rh850`, `riscv`, `rl78`, or `rx`                                                  |
+| `<package>`     | Product package    | `arm`, `armfs`, `avr`, `rh850`, `rh850fs`, `riscv`, `riscvfs`, `rl78`, `rl78fs`, `rx`, or `rxfs` |
 | `<version>`     | Package version    | `major`.`minor`.`patch` `[.build]`                                                       |
 
 Some examples:
