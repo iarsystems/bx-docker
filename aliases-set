@@ -37,7 +37,7 @@ function _bx-aliases-set()
   IMAGE_PACKAGE=${PACKAGE_DIR#/opt/iarsystems/bx}
   
 
-    # Base exec command
+  # Base exec command
   local DOCKER_EXEC_BASE=$(printf "alias bx-exec='docker exec --user `id -u`:`id -g` ${CONTAINER_ID}'")
   eval ${DOCKER_EXEC_BASE}
 
@@ -53,7 +53,7 @@ function _bx-aliases-set()
       eval $XLINKARCH
       local XAR=$(printf "alias xar='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/xar'")
       eval $XAR
-
+      ;;
     # ILINK, everything else
     *)
       local IASMARCH=$(printf "alias iasm${IMAGE_PACKAGE%fs}='bx-exec ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iasm${IMAGE_PACKAGE%fs}'")
@@ -73,6 +73,7 @@ function _bx-aliases-set()
       eval $ISYMEXPORT
       local IOBJMANIP=$(printf "alias iobjmanip='bx-exec  ${PACKAGE_DIR}/${IMAGE_PACKAGE%fs}/bin/iobjmanip'")
       eval $IOBJMANIP
+      ;;
   esac
 
   # non-<arch> execs
