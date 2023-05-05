@@ -7,9 +7,8 @@ This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provid
 >:warning: We recommended that you use this tutorial in a test environment.
 
 
-## Disclaimer
-The information in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained 
-herein is assumed to be accurate, IAR assumes no responsibility for any errors or omissions.
+## Disclaimer 
+The information provided in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained herein is useful as reference for DevOps Engineers willing to implement Continuous Integration using IAR Tools, IAR assumes no responsibility for any errors, omissions or particular implementations.
 
 
 ## Pre-requisites
