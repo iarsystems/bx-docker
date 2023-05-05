@@ -1,15 +1,14 @@
 # Tutorial<br/> Building embedded applications with<br/> the IAR Build Tools on Docker Containers
 
+## Disclaimer 
+The information provided in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained herein is useful as reference for DevOps Engineers willing to implement Continuous Integration using IAR Tools, IAR assumes no responsibility for any errors, omissions or particular implementations.
+
+## Introduction
 [Docker][url-docker-gs] is generally recognized as best practice for achieving automatically reproducible build environments. It provides the means for containerizing self-sufficient build environments that result from the requirements described in a Dockerfile.
 
 This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provide the means for building embedded applications with the [IAR Build Tools][url-iar-bx] from a Linux [container][url-docker-container].
 
 >:warning: We recommended that you use this tutorial in a test environment.
-
-
-## Disclaimer 
-The information provided in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained herein is useful as reference for DevOps Engineers willing to implement Continuous Integration using IAR Tools, IAR assumes no responsibility for any errors, omissions or particular implementations.
-
 
 ## Pre-requisites
 To complete this tutorial you need:
