@@ -29,15 +29,15 @@ These naming conventions are used in the tutorial:
 | __Placeholder__ | __Meaning__        | __Valid values__   |
 | :-------------- | :----------------- | :----------------- |
 | `<arch>`        | Architecture       | `arm`, `avr`, `rh850`, `riscv`, `rl78`, or `rx`                                                  |
-| `<package>`     | Product package    | `arm`, `armfs`, `avr`, `rh850`, `rh850fs`, `riscv`, `riscvfs`, `rl78`, `rl78fs`, `rx`, or `rxfs` |
+| `<package>`     | Product package    | `arm`, `armfs`, `avr`, `rh850`, `rh850fs`, `riscv`, `riscvfs`, `rl78` or `rx` |
 | `<version>`     | Package version    | `major`.`minor`.`patch` `[.build]`                                                       |
 
 Some examples:
 | __Installer package__              | __Meaning__                                   | __Placeholders to be replaced__ |
 | :-----------------------------     | :-------------------------------------------- | :------------------------------ |
-| bx**arm**-**9.20.4**.deb           | IAR Build Tools for Arm<br/>version 9.20.4    | `<arch>`=`arm`<br/>`<package>`=`arm`<br/>`<version>`=`9.20.4` |
-| bx**armfs**-**8.50.10.35167**.deb  | IAR Build Tools for Arm<br/>[Functional Safety Edition][url-iar-fs]<br/>version 8.50.10.35167 | `<arch>`=`arm`<br/>`<package>`=`armfs`<br/>`<version>`=`8.50.10.35167` |
-| bx**riscv**-**3.10.1**.deb         | IAR Build Tools for RISC-V<br/>version 3.10.1 | `<arch>`=`riscv`<br/>`<package>`=`riscv`<br/>`<version>`=`3.10.1` |
+| bx**arm**-**9.40.1**.deb           | IAR Build Tools for Arm<br/>version 9.40.1    | `<arch>`=`arm`<br/>`<package>`=`arm`<br/>`<version>`=`9.40.1` |
+| bx**armfs**-**9.20.3.59432**.deb  | IAR Build Tools for Arm<br/>[Functional Safety Edition][url-iar-fs]<br/>version 9.20.3.59432 | `<arch>`=`arm`<br/>`<package>`=`armfs`<br/>`<version>`=`9.20.3.59432` |
+| bx**riscv**-**3.20.1**.deb         | IAR Build Tools for RISC-V<br/>version 3.20.1 | `<arch>`=`riscv`<br/>`<package>`=`riscv`<br/>`<version>`=`3.20.1` |
 
 
 ## Installing Docker
@@ -46,14 +46,14 @@ To install the Docker Engine on the `DOCKER_HOST`, follow the [official instruct
 Alternatively, use this procedure that should work for most `DOCKER_HOST`s:
 | __Linux (Bash)__ | __Windows__ |
 | --------- | ----------- |
-| <pre>curl -fsSL https://get.docker.com -o get-docker.sh<br>sh ./get-docker.sh</pre> | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
+| `curl -fsSL https://get.docker.com -o get-docker.sh<br>sh ./get-docker.sh` | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
 
 >:bulb: On Windows hosts, make sure that Docker Desktop is set up to run Linux Containers (default).
 
 To execute Docker commands, the current user (`$USER`) must be in the `docker` group. Execute:
 | __Linux (Bash)__ | __Windows__ |
 | --------- | :-----------: |
-| <pre>sudo usermod -aG docker $USER</pre>Then log out and log in again for the changes to take effect. | N/A |
+| `sudo usermod -aG docker $USER`<br>Then log out and log in again for the changes to take effect. | N/A |
 
 
 ## Building a Docker image
@@ -64,14 +64,14 @@ This [__Dockerfile__](Dockerfile) was created as a universal template to build i
 The [__`build`__](build) script will use the [`docker build`][url-docker-docs-build] command with the Dockerfile, together with an installer package (__bx`<package>`-`<version>`.deb__), to create one image.
 
 To build the image, clone the [bx-docker][url-repo] repository to the user's home directory:
-| __Linux (Bash)__ | __Windows (Powershell)__ |
+| __Linux (Bash)__ | __Windows (PowerShell)__ |
 | --------- | ----------- |
-| <pre>git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker</pre> | <pre>git clone https://github.com/iarsystems/bx-docker.git $home/bx-docker</pre> |
+| `git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker` | `git clone https://github.com/iarsystems/bx-docker.git $home/bx-docker` |
 
 Then, invoke the __`build`__ script that points to the installer package:
-| __Linux (Bash)__ | __Windows (Powershell)__ |
+| __Linux (Bash)__ | __Windows (PowerShell)__ |
 | --------- | ----------- |
-| <pre>~/bx-docker/build /path/to/bx<package>-<version>.deb</pre> | <pre>./bx-docker/build /path/to/bx<package>-<version>.deb</pre> |
+| `~/bx-docker/build /path/to/bx<package>-<version>.deb` | `./bx-docker/build /path/to/bx<package>-<version>.deb` |
 
 Depending on your system's properties, it might take a while to build the image. The build time ranges from seconds to a few minutes. In the end, the __`build`__ script will automatically tag the image as __iarsystems/bx`<package>`:`<version>`__.
 
@@ -84,19 +84,19 @@ docker images iarsystems/*
 The output will be similar to this, depending on which images you have created:
 >```
 >REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE
->iarsystems/bxarm                   9.20.4              cef45bb09322        5 minutes ago       2.42GB
->iarsystems/bxarmfs                 9.20.3.45167        527420cb4fcf        8 minutes ago       2.37GB
->iarsystems/bxriscv                 3.30.1              89bd0878856f        About an hour ago   2.25GB
+>iarsystems/bxarm                   9.40.1              93eb28dd4e65        2 minutes ago       3.17GB
+>iarsystems/bxarmfs                 9.20.3.59432        abc420034fcb        8 minutes ago       2.45GB
+>iarsystems/bxriscv                 3.20.1              89bd0878856f        About an hour ago   1.46GB
 >```
 
 
 ## Setting up the license
 The IAR Build Tools require an available network license to operate.
 
-To set up the license for all the containers in the `DOCKER_HOST`, execute the [__`setup-license`__](setup-license) script, pointing to the image's `\<tagname:version\>` followed by the IAR LMS2 License Server's IP address:
-| __Linux (Bash)__ | __Windows (Powershell)__ |
-| --------- | ----------- |
-| <pre>~/bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> | <pre>./bx-docker/setup-license iarsystems/bx\<package\>:\<version\> \<lms2-server-ip\></pre> |
+To set up the license for all the containers in the `DOCKER_HOST`, execute the [__`setup-license`__](setup-license) script, pointing to the image's `<tagname:version>` followed by the IAR LMS2 License Server's IP address:
+| __Linux (Bash)__ | __Windows (PowerShell)__ |
+| ---------------- | ------------------------ |
+| `~/bx-docker/setup-license iarsystems/bx<package>:<version> <lms2-server-ip>` | `./bx-docker/setup-license iarsystems/bx<package>:<version> <lms2-server-ip>` |
 
 The __`setup-license`__ script will prepare a [Docker volume][url-docker-docs-volume] to be shared by all containers that run on the `DOCKER_HOST`, for persistent storage of the license configuration.
 
@@ -111,14 +111,14 @@ In this section, you will use the image you created to run a container so that y
 The [bx-docker][url-repo] repository comes with projects created in the [IAR Embedded Workbench IDE][url-iar-ew] for the supported target architectures. 
 
 Access the [projects](projects) subdirectory:
-| __Linux (Bash)__ | __Windows (Powershell)__ |
+| __Linux (Bash)__ | __Windows (PowerShell)__ |
 | --------- | ----------- |
-| <pre>cd ~/bx-docker/projects</pre> | <pre>cd ./bx-docker/projects</pre> |
+| `cd ~/bx-docker/projects` | `cd ./bx-docker/projects` |
 
 The [__`run`__](run) script will use the [`docker run`][url-docker-docs-run] command with all the necessary parameters to run the container. Execute:
-| __Linux (Bash)__ | __Windows (Powershell)__ |
+| __Linux (Bash)__ | __Windows (PowerShell)__ |
 | --------- | ----------- |
-| <pre>~/bx-docker/run iarsystems/bx\<package\>:\<version\></pre>Follow the instructions provided by the __`run`__ script output, to source the __`aliases-set`__ script. | <pre>../run iarsystems/bx\<package\>:\<version\></pre>The __`aliases-set`__ script is invoked automatically by the run command and applied to the current shell session. |
+| `~/bx-docker/run iarsystems/bx\<package\>:\<version\>`Follow the instructions provided by the __`run`__ script output, to source the __`aliases-set`__ script. | `../run iarsystems/bx\<package\>:\<version\>`The __`aliases-set`__ script is invoked automatically by the run command and applied to the current shell session. |
 
 Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`/build`). This way, these containers cannot access any parent directories. Make sure to always run a container from the project's top directory, from which all the project's files are accessible.
 
