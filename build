@@ -49,9 +49,7 @@ function _bx_build_docker_image()
     BXRISCV) local BX_ARCH=riscv;;
     BXRISCVFS) local BX_ARCH=riscv;;
     BXRL78) local BX_ARCH=rl78;;
-    BXRL78FS) local BX_ARCH=rl78;;
     BXRX) local BX_ARCH=rx;;
-    BXRXFS) local BX_ARCH=rx;;
     BXAVR) local BX_ARCH=avr;;
     *) echo "ERROR: invalid package. (${PKG_NAME^^})" >&2; _bx_show_help; return 1;;
   esac
