@@ -118,7 +118,7 @@ Access the [projects](projects) subdirectory:
 The [__`run`__](run) script will use the [`docker run`][url-docker-docs-run] command with all the necessary parameters to run the container. Execute:
 | __Linux (Bash)__ | __Windows (PowerShell)__ |
 | --------- | ----------- |
-| `~/bx-docker/run iarsystems/bx\<package\>:\<version\>`Follow the instructions provided by the __`run`__ script output, to source the __`aliases-set`__ script. | `../run iarsystems/bx\<package\>:\<version\>`The __`aliases-set`__ script is invoked automatically by the run command and applied to the current shell session. |
+| `~/bx-docker/run iarsystems/bx<package>:<version>`<br>Follow the instructions provided by the __`run`__ script output, to source the __`aliases-set`__ script. | `../run iarsystems/bx<package>:<version>`<br>The __`aliases-set`__ script is invoked automatically by the run command and applied to the current shell session. |
 
 Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`/build`). This way, these containers cannot access any parent directories. Make sure to always run a container from the project's top directory, from which all the project's files are accessible.
 
