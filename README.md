@@ -46,7 +46,7 @@ To install the Docker Engine on the `DOCKER_HOST`, follow the [official instruct
 Alternatively, use this procedure that should work for most `DOCKER_HOST`s:
 | __Linux (Bash)__ | __Windows__ |
 | --------- | ----------- |
-| `curl -fsSL https://get.docker.com -o get-docker.sh<br>sh ./get-docker.sh` | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
+| `curl -fsSL https://get.docker.com -o get-docker.sh`<br>`sh ./get-docker.sh` | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
 
 >:bulb: On Windows hosts, make sure that Docker Desktop is set up to run Linux Containers (default).
 
