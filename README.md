@@ -14,7 +14,7 @@ This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provid
 To complete this tutorial you need:
 - An understanding of how to use command line tools
 - An [__IAR Build Tools__][url-iar-bx] installer package in the `.deb` format
-   - >:bulb: [__Contact us__][url-iar-contact] to get access to the installers.
+   - IAR customers can download it directly from [IAR MyPages](https://iar.my.site.com/mypages). If you do not have a license, [__contact sales__][url-iar-contact].
 - A recent __x86_64/amd64__ machine
    - with Ubuntu 18+ (or Debian 10+, or Fedora 35+, ...), or Windows 10 21H1+ (build 19043)
    - connected to the internet
