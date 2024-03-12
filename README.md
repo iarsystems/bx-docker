@@ -1,43 +1,38 @@
-# Tutorial<br/> Building embedded applications with<br/> the IAR Build Tools on Docker Containers
+# Building embedded applications with<br/> the IAR Build Tools on Docker Containers
 
-## Disclaimer 
-The information provided in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained herein is useful as reference for DevOps Engineers willing to implement Continuous Integration using IAR Tools, IAR assumes no responsibility for any errors, omissions or particular implementations.
+> __Disclaimer__
+> The information provided in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained herein is useful as reference for DevOps Engineers willing to implement Continuous Integration using IAR Tools, IAR assumes no responsibility for any errors, omissions or particular implementations.
 
 ## Introduction
 [Docker][url-docker-gs] is generally recognized as best practice for achieving automatically reproducible build environments. It provides the means for containerizing self-sufficient build environments that result from the requirements described in a Dockerfile.
 
 This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provide the means for building embedded applications with the [IAR Build Tools][url-iar-bx] from a Linux [container][url-docker-container].
 
->:warning: We recommended that you use this tutorial in a test environment.
+> [!TIP]
+> We recommended that you initially perform the this tutorial within a test environment.
 
 ## Pre-requisites
 To complete this tutorial you need:
-- An understanding of how to use command line tools
-- An [__IAR Build Tools__][url-iar-bx] installer package in the `.deb` format
-   - IAR customers can download it directly from [IAR MyPages](https://iar.my.site.com/mypages). If you do not have a license, [__contact sales__][url-iar-contact].
-- A recent __x86_64/amd64__ machine
-   - with Ubuntu 18+ (or Debian 10+, or Fedora 35+, ...), or Windows 10 21H1+ (build 19043)
-   - connected to the internet
-   - >:bulb: In this tutorial, this machine will be referred to as `DOCKER_HOST`.
-- An [__IAR LMS2 License Server__](https://links.iar.com/lms2-server)
-   - with activated license(s) for the product in the `.deb` package
-   - reachable from the `DOCKER_HOST`.
+- An understanding of how to use command line tools.
+### IAR Build Tools
+A [__IAR Build Tools__][url-iar-bx] installer package of your choice for Ubuntu(/Debian) in the `.deb` format, which IAR customers can download it directly from [IAR MyPages](https://iar.my.site.com/mypages).
 
+The IAR Build Tools installer packages are delivered using the following name standard:
+```
+bx<arch>[fs]-<V.vv.patch[.build]>.deb
+```
+where `[fs]` and `[.build]` in the package names show up to distinguish tools that are pre-certified for [Functional Safety](https://iar.com/fusa).
 
-## Conventions
-These naming conventions are used in the tutorial:
-| __Placeholder__ | __Meaning__        | __Valid values__   |
-| :-------------- | :----------------- | :----------------- |
-| `<arch>`        | Architecture       | `arm`, `avr`, `rh850`, `riscv`, `rl78`, or `rx`                                                  |
-| `<package>`     | Product package    | `arm`, `armfs`, `avr`, `rh850`, `rh850fs`, `riscv`, `riscvfs`, `rl78` or `rx` |
-| `<version>`     | Package version    | `major`.`minor`.`patch` `[.build]`                                                       |
-
-Some examples:
-| __Installer package__              | __Meaning__                                   | __Placeholders to be replaced__ |
-| :-----------------------------     | :-------------------------------------------- | :------------------------------ |
-| bx**arm**-**9.40.1**.deb           | IAR Build Tools for Arm<br/>version 9.40.1    | `<arch>`=`arm`<br/>`<package>`=`arm`<br/>`<version>`=`9.40.1` |
-| bx**armfs**-**9.20.3.59432**.deb  | IAR Build Tools for Arm<br/>[Functional Safety Edition][url-iar-fs]<br/>version 9.20.3.59432 | `<arch>`=`arm`<br/>`<package>`=`armfs`<br/>`<version>`=`9.20.3.59432` |
-| bx**riscv**-**3.20.1**.deb         | IAR Build Tools for RISC-V<br/>version 3.20.1 | `<arch>`=`riscv`<br/>`<package>`=`riscv`<br/>`<version>`=`3.20.1` |
+### Docker Engine
+A __x86_64/amd64__ platform supported by the Docker Engine ([supported platforms](https://docs.docker.com/engine/install/#supported-platforms)) capable of accessing the Internet for downloading the necessary packages.
+> [!NOTE]
+> In this guide, network node in which the Docker Engine was installed will be referred to as `DOCKER_HOST`.
+### IAR License Server (LMS2 Technology)
+An [__IAR License Server__](https://links.iar.com/lms2-server)
+- ready to serve, up and running, with __activated__ license(s) for one or more network nodes running the __IAR Build Tools__ of your choice -and-
+- reachable from the platform in which the `DOCKER_HOST` is running as described above.
+> [!TIP]
+> If you do not have the licenses you need, [__contact us__][url-iar-contact].
 
 
 ## Installing Docker
@@ -48,7 +43,8 @@ Alternatively, use this procedure that should work for most `DOCKER_HOST`s:
 | --------- | ----------- |
 | `curl -fsSL https://get.docker.com -o get-docker.sh`<br>`sh ./get-docker.sh` | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
 
->:bulb: On Windows hosts, make sure that Docker Desktop is set up to run Linux Containers (default).
+> [!NOTE]
+> On Windows hosts, make sure that Docker Desktop is set up to run Linux Containers (default).
 
 To execute Docker commands, the current user (`$USER`) must be in the `docker` group. Execute:
 | __Linux (Bash)__ | __Windows__ |
@@ -75,7 +71,8 @@ Then, invoke the __`build`__ script that points to the installer package:
 
 Depending on your system's properties, it might take a while to build the image. The build time ranges from seconds to a few minutes. In the end, the __`build`__ script will automatically tag the image as __iarsystems/bx`<package>`:`<version>`__.
 
->:bulb: Invoke the __`build`__ script once for each installer package you have, to get one dedicated image for each package.
+> [!TIP]
+> Invoke the __`build`__ script once for each installer package you have, to get one dedicated image for each package.
 
 Once you have created the image, execute the [`docker images`][url-docker=docs-images] command to list all created images:
 ```
@@ -100,9 +97,10 @@ To set up the license for all the containers in the `DOCKER_HOST`, execute the [
 
 The __`setup-license`__ script will prepare a [Docker volume][url-docker-docs-volume] to be shared by all containers that run on the `DOCKER_HOST`, for persistent storage of the license configuration.
 
->:bulb: This step can only be performed once. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed.
-
->:bulb: If your network has multiple build nodes (`DOCKER_HOST`s), __`setup-license`__ must be run __individually__ on all of them.
+> [!TIP]
+>  This step can only be performed once. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed.
+>
+> If your network has multiple build nodes (`DOCKER_HOST`s), __`setup-license`__ must be run __individually__ on all of them.
 
 
 ## Running a container
@@ -122,15 +120,14 @@ The [__`run`__](run) script will use the [`docker run`][url-docker-docs-run] com
 
 Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`/build`). This way, these containers cannot access any parent directories. Make sure to always run a container from the project's top directory, from which all the project's files are accessible.
 
->:bulb: The `docker run --help` command provides more information.
+> [!TIP]
+> The `docker run --help` command provides more information.
 
 
 ## Executing the Build Tools
 The [`docker exec`][url-docker-docs-exec] command can execute a command in a running container. Often, these command lines will get too long to type every single time.
 
 When you spawned the container using the [__`run`__](scripts/run) script, you also got [bash aliases](https://en.wikipedia.org/wiki/Alias_%28command%29) set for all the IAR Build Tools from the image you selected to work with. These aliases encapsulated the required `docker exec` commands in such a way that the `DOCKER_HOST` can now execute all the IAR Build Tools seamlessly.
-
->:bulb: The `docker run --help` command provides more information.
 
 ### Build the project with __iarbuild__
 The IAR Command Line Build Utility (`iarbuild`) can build (or analyze) a `<project>.ewp` file.
@@ -142,7 +139,8 @@ For example, use `iarbuild` with the `-build <build-cfg>` command to build the `
 iarbuild <arch>/hello-world.ewp -build Release
 ```
 
->:bulb:  Invoke `iarbuild` with no parameters for a detailed description.
+> [!TIP]
+> Invoke `iarbuild` with no parameters for a detailed description.
 
 
 ### Performing static code analysis
@@ -171,9 +169,10 @@ ireport --full --project hello-world --db <arch>/Release/path/to/cstat.db
 > HTML report generated: hello-world.html
 > ```
 
->:bulb: On the Linux Bash shell, you can use `lynx hello-world.html` to visualize the text contents of the HTML report. This report contains graphical elements, so use a desktop web browser to visualize its full contents.
-
->:bulb: Customized ruleset selections for a `<project>`__.ewp__ project are automatically stored in a corresponding `<project>`__.ewt__ file. If the project is under version control, you are advised to check in this file as well.
+> [!TIP]
+> On the Linux Bash shell, you can use `lynx hello-world.html` to visualize the text contents of the HTML report. This report contains graphical elements, so use a desktop web browser to visualize its full contents.
+>
+> Customized ruleset selections for a `<project>`__.ewp__ project are automatically stored in a corresponding `<project>`__.ewt__ file. If the project is under version control, you are advised to check in this file as well.
 
    
 ## Issues
