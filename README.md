@@ -9,7 +9,7 @@
 This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provide the means for building embedded applications with the [IAR Build Tools][url-iar-bx] from a Linux [container][url-docker-container].
 
 > [!TIP]
-> We recommended that you initially perform the this tutorial within a test environment.
+> We recommended that you initially perform this tutorial within a test environment.
 
 ## Pre-requisites
 To complete this tutorial you need:
