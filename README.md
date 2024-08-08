@@ -1,7 +1,7 @@
 # Building embedded applications with<br/> the IAR Build Tools on Docker Containers
 
 > __Disclaimer__
-> The information provided in this repository is subject to change without notice and does not represent a commitment on any part of IAR. While the information contained herein is useful as reference for DevOps Engineers willing to implement Continuous Integration using IAR Tools, IAR assumes no responsibility for any errors, omissions or particular implementations.
+> The information in this repository is subject to change without notice and does not constitute a commitment by IAR. While it serves as a valuable reference for DevOps Engineers implementing Continuous Integration with IAR Tools, IAR assumes no responsibility for any errors, omissions, or specific implementations.
 
 ## Introduction
 [Docker][url-docker-gs] is generally recognized as best practice for achieving automatically reproducible build environments. It provides the means for containerizing self-sufficient build environments that result from the requirements described in a Dockerfile.
@@ -174,22 +174,22 @@ ireport --full --project hello-world --db <arch>/Release/path/to/cstat.db
 >
 > Customized ruleset selections for a `<project>`__.ewp__ project are automatically stored in a corresponding `<project>`__.ewt__ file. If the project is under version control, you are advised to check in this file as well.
 
-   
-## Issues
-Did you find an issue or do you have a suggestion related to the [__bx-docker__][url-repo] tutorial? Please use the public issue tracker.
-- Do not forget to take a look at [earlier issues][url-repo-issue-old].
-- If you are reporting a [new][url-repo-issue-new] issue, please describe it in detail.
-
 
 ## Summary
-This tutorial decribes how the [IAR Build Tools][url-iar-bx] can run on Linux containers.
+This tutorial explains how to run the [IAR Build Tools][url-iar-bx] on Linux containers.
    
-From the scripts, the [Dockerfile](Dockerfile), and the official [Docker Documentation][url-docker-docs] &mdash;which can form a cornerstone for your organization&mdash; you can learn how to use this setup as it is or to customize it so that the containers run in the way you need them to.
+Using the provided scripts, [Dockerfile](Dockerfile), and official [Docker Documentation][url-docker-docs], you can either use this setup as-is or customize it to ensure the containers operate according to your specific requirements. This setup can serve as a fundational element for your organization.
 
-<!-- [Here][url-iar-bx] you can find additional resources such as on-demand webinars about the IAR Build Tools within automated workflows scenarios. -->
 
-   
+## Issues
+For technical support contact [IAR Customer Support][url-iar-customer-support].
+
+For questions or suggestions related to this tutorial: try the [wiki][url-repo-wiki] or check [earlier issues][url-repo-issue-old]. If those don't help, create a [new issue][url-repo-issue-new] with detailed information.
+
+
 <!-- Links -->
+[url-iar-customer-support]: https://iar.my.site.com/mypages/s/contactsupport
+
 [url-iar-bx]:              https://iar.com/bx
 [url-iar-contact]:         https://iar.com/about/contact
 [url-iar-cstat]:           https://iar.com/cstat
