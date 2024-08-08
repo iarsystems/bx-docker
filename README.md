@@ -180,6 +180,8 @@ This tutorial explains how to run the [IAR Build Tools][url-iar-bx] on Linux con
    
 Using the provided scripts, [Dockerfile](Dockerfile), and official [Docker Documentation][url-docker-docs], you can either use this setup as-is or customize it to ensure the containers operate according to your specific requirements. This setup can serve as a fundational element for your organization.
 
+[__` Follow us `__](https://github.com/iarsystems) on GitHub to get updates about tutorials like this and more.
+
 
 ## Issues
 For technical support contact [IAR Customer Support][url-iar-customer-support].
