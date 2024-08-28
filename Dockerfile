@@ -1,5 +1,5 @@
 # 
-# Copyright (c) 2020-2022 IAR Systems AB
+# Copyright (c) 2020-2024 IAR Systems AB
 #
 # Dockerfile for the IAR Build Tools (BX)
 #
