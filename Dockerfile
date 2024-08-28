@@ -29,7 +29,7 @@ COPY bx*.deb /tmp
 
 #
 # Install the necessary packages and cleanup
-#  sudo                      : required by bx*.deb
+#  sudo                      : required by earlier versions of bx*.deb
 #  libsqlite3-0              : required by iarbuild
 #  libxml2, tzdata           : required by C-STAT
 #
