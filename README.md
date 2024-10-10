@@ -61,7 +61,7 @@ This [__Dockerfile__](Dockerfile) was created as a universal template to build i
 The [__`build`__](build) script will use the [`docker build`][url-docker-docs-build] command with the Dockerfile, together with an installer package (__bx`<package>`-`<version>`.deb__), to create one image.
 
 To build the image, you need to perform these three steps:
-1. Set an environment variable with the download URL to the installer package you received from IAR Customer Support (set `BX_DOWNLOAD_URL` to the correct address).
+1. Set `BX_DOWNLOAD_URL` with the download link to the installer package you received from IAR Customer Support during your on-boarding process.
 ```bash
 export BX_DOWNLOAD_URL=<fill-with-the-download-URL>
 ```
@@ -253,13 +253,15 @@ Now exit the container:
 You will find all your project files generated under `~/bx-workspaces-ci`. However they belong to root as it was the default user for the container. In order to get ownership of all generated files, perform:
 ```console
 $ sudo chown -Rv $USER:$USER bx-workspaces-ci/
-changed ownership of 'bx-workspaces-ci/LICENSE' from root:root to felipeto:felipeto
+changed ownership of 'bx-workspaces-ci/LICENSE' from root:root to <user>:<user>
+changed ownership of 'bx-workspaces-ci/tests/test-crc32.c' from root:root to <user>:<user>
+changed ownership of 'bx-workspaces-ci/tests/test-crc16.c' from root:root to <user>:<user>
 ...
 ```
 
 
 ## Summary
-This tutorial explains how to run the [IAR Build Tools][url-iar-bx] on Linux containers.
+This tutorial guided you through one way of running the [IAR Build Tools][url-iar-bx] on Linux containers.
    
 Using the provided scripts, [Dockerfile](Dockerfile), and official [Docker Documentation][url-docker-docs], you can either use this setup as-is or customize it to ensure the containers operate according to your specific requirements. This setup can serve as a fundational element for your organization.
 
