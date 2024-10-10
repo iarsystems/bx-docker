@@ -31,9 +31,7 @@ A __x86_64/amd64__ platform supported by the Docker Engine ([supported platforms
 > In this guide, network node in which the Docker Engine was installed will be referred to as `DOCKER_HOST`.
 
 ### IAR License Server
-The [__IAR License Server__](https://links.iar.com/lms2-server)
-- ready to serve, up and running, with __activated__ license(s) for the network nodes with the __IAR Build Tools__ of your choice -and-
-- reachable from the platform in which the `DOCKER_HOST` is running as described above.
+The [__IAR License Server__](https://links.iar.com/lms2-server) ready to serve, up and running, with __activated__ license(s) for the network nodes with the __IAR Build Tools__ of your choice -and- reachable from the platform in which the `DOCKER_HOST` is running as described above.
 > [!TIP]
 > If you do not have the licenses you need, [__contact us__][url-iar-contact].
 
@@ -115,75 +113,148 @@ setup-license: LMS2 license setup completed.
 >  Setting up the license for a Docker image in such a way only needs to be performed once per __DOCKER_HOST__. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed. For manually removing a named volume, use `docker volume rm <volume-name>`.
 
 ## Running a container
-In this section, you will use the image you created to run a container so that you can build a project later.
+In this section, you will run an interactive container locally, clone and build a project with the image you have created.
 
-The [bx-docker][url-repo] repository comes with projects created in the [IAR Embedded Workbench IDE][url-iar-ew] for the supported target architectures. 
+It is important to choose the directory where you want to run your container. The following command line will bind the current directory (`$PWD`) to the "my-iar-bx-container" container's working directory (`/build`) for the `iarsystems/bx<image>:<tag>` image.
 
-Access the [projects](projects) subdirectory:
-| __Linux (Bash)__ | __Windows (PowerShell)__ |
-| --------- | ----------- |
-| `cd ~/bx-docker/projects` | `cd ./bx-docker/projects` |
-
-The [__`run`__](run) script will use the [`docker run`][url-docker-docs-run] command with all the necessary parameters to run the container. Execute:
-| __Linux (Bash)__ | __Windows (PowerShell)__ |
-| --------- | ----------- |
-| `~/bx-docker/run iarsystems/bx<package>:<version>`<br>Follow the instructions provided by the __`run`__ script output, to source the __`aliases-set`__ script. | `../run iarsystems/bx<package>:<version>`<br>The __`aliases-set`__ script is invoked automatically by the run command and applied to the current shell session. |
-
-Containers spawned by the __`run`__ script will bind mount the current directory (`pwd`) to the Docker image's working directory (`/build`). This way, these containers cannot access any parent directories. Make sure to always run a container from the project's top directory, from which all the project's files are accessible.
+```console
+$ cd ~
+$ docker run \
+  --restart=unless-stopped \
+  --detach \
+  --tty \
+  --name my-iar-bx-container \
+  --hostname `hostname` \
+  --volume LMS2:/usr/local/etc/IARSystems \
+  --volume $PWD:/build \
+  iarsystems/bx<image>:<tag>
+2108d5fba0b345913efd5effe2388ff87120c555ded79236cb5b3ff34f59203d  
+```
+The hash number is dynamically created for any new container and uniquely identifies it. So now, thanks to the `--volume` parameter, all existing files from the home directory and below are visible when you enter the container. In the same way, once you exit the container, any files created within the container will remain in their correspondent locations within the home directory. You can check your containers with `docker container ls`:
+```console
+$ docker container ls
+CONTAINER ID  IMAGE                    COMMAND      CREATED          STATUS          NAMES
+dcc6c9f4e104  iarsystems/bxarm:9.60.2  "/bin/bash"  30 seconds ago   Up 29 seconds   my-iar-bx-container
+```
 
 > [!TIP]
 > The `docker run --help` command provides more information.
 
-
-## Executing the Build Tools
-The [`docker exec`][url-docker-docs-exec] command can execute a command in a running container. Often, these command lines will get too long to type every single time.
-
-When you spawned the container using the [__`run`__](scripts/run) script, you also got [bash aliases](https://en.wikipedia.org/wiki/Alias_%28command%29) set for all the IAR Build Tools from the image you selected to work with. These aliases encapsulated the required `docker exec` commands in such a way that the `DOCKER_HOST` can now execute all the IAR Build Tools seamlessly.
-
-### Build the project with __iarbuild__
-The IAR Command Line Build Utility (`iarbuild`) can build (or analyze) a `<project>.ewp` file.
-
-The simplified `iarbuild` syntax is: `iarbuild relative/path/to/<project>.ewp [command] <build-cfg>`.
-
-For example, use `iarbuild` with the `-build <build-cfg>` command to build the `hello-world.ewp` project using the build configuration for "Release": 
+Enter the container:
+```console
+$ docker exec -it my-iar-bx-container bash
+root@<the-docker_host-hostname>:~# 
 ```
-iarbuild <arch>/hello-world.ewp -build Release
+
+For this example we will clone a public repository with projects created in the [IAR Embedded Workbench IDE][url-iar-ew] for the supported target architectures:
+```console
+# git clone https://github.com/iarsystems/bx-workspaces-ci
+Cloning into 'bx-workspaces-ci'...
+remote: Enumerating objects: 345, done.
+remote: Counting objects: 100% (99/99), done.
+remote: Compressing objects: 100% (54/54), done.
+remote: Total 345 (delta 44), reused 64 (delta 44), pack-reused 246 (from 1)
+Receiving objects: 100% (345/345), 159.12 KiB | 631.00 KiB/s, done.
+Resolving deltas: 100% (211/211), done.
+```
+
+## Building projects with the IAR Build Tools
+Finally build the library project for the selected `<target>` (e.g. arm, avr, riscv, rl78, rx, rh850). In the following example, "arm" was selected and `iarbuild` was used to build the project:
+```console
+# /opt/iarsystems/bxarm/common/bin/iarbuild bx-workspaces-ci/targets/arm/library.ewp -build Release
+
+     IAR Command Line Build Utility V9.3.5.863
+     Copyright 2002-2024 IAR Systems AB.
+
+
+library - Release
+Reading project nodes...
+
+Cleaning... 0 files.
+crc16.c
+crc32.c
+library.a
+
+Total number of errors: 0
+Total number of warnings: 0
+Build succeeded
+```
+
+Now build the application project that is linked against the library for the same selected target. In this example, `targets/arm` was selected for demonstration:
+```console
+# /opt/iarsystems/bxarm/common/bin/iarbuild bx-workspaces-ci/targets/arm/test-crc32.ewp -build Release
+
+     IAR Command Line Build Utility V9.3.5.863
+     Copyright 2002-2024 IAR Systems AB.
+
+
+test-crc32 - Release
+Reading project nodes...
+
+Cleaning... 0 files.
+test-crc32.c
+test-crc32.out
+
+Total number of errors: 0
+Total number of warnings: 0
+Build succeeded
 ```
 
 > [!TIP]
-> Invoke `iarbuild` with no parameters for a detailed description.
+> Invoke `/opt/iarsystems/bx<target>/common/bin/iarbuild` with no parameters for a detailed description of available options.
 
 
 ### Performing static code analysis
-Static Code Analysis can be performed with [IAR C-STAT][url-iar-cstat].
+Additionally, [IAR C-STAT][url-iar-cstat] is an add-on to the IAR Build Tools that can perform static code analysis. It helps you ensure code quality in your applications. If you have C-STAT, `iarbuild` can drive the analysis with the `-cstat_analyze <build-cfg>` command to analyze the project.
 
-C-STAT is an add-on to the IAR Build Tools that helps you ensure code quality in your applications.
-If you have C-STAT, `iarbuild` can be used with the `-cstat_analyze <build-cfg>` command to analyze the project.
+Using the library project in `bx-workspaces-ci/targets/arm` as an example:
+```console
+# /opt/iarsystems/bxarm/common/bin/iarbuild bx-workspaces-ci/targets/arm/library.ewp -cstat_analyze Release
 
-To perform an analysis using the "Release" configuration for the `hello-world.ewp` project, execute: 
-```
-iarbuild <arch>/hello-world.ewp -cstat_analyze Release
-```
+     IAR Command Line Build Utility V9.3.5.863
+     Copyright 2002-2024 IAR Systems AB.
 
-The analysis results are stored in an SQLite database named `cstat.db`. This database can be used for generating an analysis report with warnings about coding violations for the project's ruleset selection.
 
-Use `icstat` to display the warnings on the terminal:
-```
-icstat load --db <arch>/Release/path/to/cstat.db
+library - Release
+
+Analysis completed. 8 message(s)
 ```
 
-And then use `ireport` to generate an HTML report:
-```
-ireport --full --project hello-world --db <arch>/Release/path/to/cstat.db
-```
-> ```
-> HTML report generated: hello-world.html
-> ```
+The analysis results are stored in an SQLite database named `cstat.db`. This database can be used for generating an analysis report with warnings about coding violations for the project's ruleset selection. Use `icstat` to retrieve the warnings and display them on the terminal. For example:
+```console
+# /opt/iarsystems/bxarm/arm/bin/icstat load --db $(find bx-workspaces-ci -name "cstat.db")
+"bx-workspaces-ci/library/source/crc32.c",29 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
 
-> [!TIP]
-> On the Linux Bash shell, you can use `lynx hello-world.html` to visualize the text contents of the HTML report. This report contains graphical elements, so use a desktop web browser to visualize its full contents.
->
-> Customized ruleset selections for a `<project>`__.ewp__ project are automatically stored in a corresponding `<project>`__.ewt__ file. If the project is under version control, you are advised to check in this file as well.
+"bx-workspaces-ci/library/source/crc32.c",30 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
+
+"bx-workspaces-ci/library/source/crc32.c",31 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
+
+"bx-workspaces-ci/library/source/crc32.c",32 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
+
+"bx-workspaces-ci/library/source/crc32.c",33 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
+
+"bx-workspaces-ci/library/source/crc32.c",34 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
+
+"bx-workspaces-ci/library/source/crc32.c",35 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
+
+"bx-workspaces-ci/library/source/crc32.c",36 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
+```
+
+And then use `ireport` to generate an HTML report. In this example:
+```console
+# /opt/iarsystems/bxarm/arm/bin/ireport --full --project library --db $(find bx-workspaces-ci -name "cstat.db")
+HTML report generated: library.html
+```
+
+Now exit the container:
+```console
+# exit
+```
+You will find all your project files generated under `~/bx-workspaces-ci`. However they belong to root as it was the default user for the container. In order to get ownership of all generated files, perform:
+```console
+$ sudo chown -Rv $USER:$USER bx-workspaces-ci/
+changed ownership of 'bx-workspaces-ci/LICENSE' from root:root to felipeto:felipeto
+```
 
 
 ## Summary
