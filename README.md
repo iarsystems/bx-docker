@@ -28,18 +28,18 @@ where `[fs]` and `[.build]` in the package names show up to distinguish tools th
 ### Docker Engine
 A __x86_64/amd64__ platform supported by the Docker Engine ([supported platforms](https://docs.docker.com/engine/install/#supported-platforms)) capable of accessing the Internet for downloading the necessary packages.
 > [!NOTE]
-> In this guide, network node in which the Docker Engine was installed will be referred to as `DOCKER_HOST`.
+> In this guide, network node in which the Docker Engine was installed will be referred to as __DOCKER_HOST__.
 
 ### IAR License Server
-The [__IAR License Server__](https://links.iar.com/lms2-server) ready to serve, up and running, with __activated__ license(s) for the network nodes with the __IAR Build Tools__ of your choice -and- reachable from the platform in which the `DOCKER_HOST` is running as described above.
+The [__IAR License Server__](https://links.iar.com/lms2-server) ready to serve, up and running, with __activated__ license(s) for the network nodes with the __IAR Build Tools__ of your choice -and- reachable from the platform in which the __DOCKER_HOST__ is running as described above.
 > [!TIP]
 > If you do not have the licenses you need, [__contact us__][url-iar-contact].
 
 
 ## Installing Docker
-To install the Docker Engine on the `DOCKER_HOST`, follow the [official instructions][url-docker-docs-install].
+To install the Docker Engine on the __DOCKER_HOST__, follow the [official instructions][url-docker-docs-install].
 
-Alternatively, launch a new bash shell and use the following procedure, known to work for most `DOCKER_HOST`s:
+Alternatively, launch a new bash shell and use the following procedure, known to work for most __DOCKER_HOST__s:
 ```bash
 sudo apt update
 sudo apt install curl
@@ -99,26 +99,24 @@ The IAR Build Tools require an available network license to operate.
 
 The [__`setup-license`__](setup-license) script prepares a named [Docker volume][url-docker-docs-volume] for storing persistent license configuration for any containers belonging to the same __DOCKER_HOST__. 
 
-In the bash shell, perform the following step (replace `iarsystems/<image>:<tag>` and `<iar-license-server-ip>` by the actual ones):
+In the bash shell, perform the following step (replace `iarsystems/bx<image>:<tag>` and `<iar-license-server-ip>` by the actual ones):
 ```console 
-$ ~/bx-docker/setup-license iarsystems/<image>:<tag> <iar-license-server-ip>
-setup-license: Creating a Docker volume for LMS2...
-LMS2
-9825affb94394ea88e10a49da75d2baf9bcc5516f03ab7bded66e9fc6397ecdb
-bx-license-setup
-setup-license: LMS2 license setup completed.
+$ ~/bx-docker/setup-license iarsystems/bx<image>:<tag> <iar-license-server-ip>
+-- setup-license: Creating a Docker volume for storing persistent license information...
+-- setup-license: Running a container for setting up the license...
+-- setup-license: Setting up the license with IAR Light License Manager...
+-- setup-license: Finished.
 ```
 
-> [!TIP]
->  Setting up the license for a Docker image in such a way only needs to be performed once per __DOCKER_HOST__. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed. For manually removing a named volume, use `docker volume rm <volume-name>`.
+>[!TIP]
+>Setting up the license for a Docker image in such a way only needs to be performed once per __DOCKER_HOST__. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed. For manually removing a named volume, remove all containers using it and then use `docker volume rm <volume-name>`.
 
 ## Running a container
 In this section, you will run an interactive container locally, clone and build a project with the image you have created.
 
-It is important to choose the directory where you want to run your container. The following command line will bind the current directory (`$PWD`) to the "my-iar-bx-container" container's working directory (`/build`) for the `iarsystems/bx<image>:<tag>` image.
+The following command line will bind the home directory (`$HOME`) to the "my-iar-bx-container" container's working directory (`/build`) for the `iarsystems/bx<image>:<tag>` image.
 
 ```console
-$ cd ~
 $ docker run \
   --restart=unless-stopped \
   --detach \
@@ -126,11 +124,14 @@ $ docker run \
   --name my-iar-bx-container \
   --hostname `hostname` \
   --volume LMS2:/usr/local/etc/IARSystems \
-  --volume $PWD:/build \
+  --volume $HOME:/build \
   iarsystems/bx<image>:<tag>
 2108d5fba0b345913efd5effe2388ff87120c555ded79236cb5b3ff34f59203d  
 ```
-The hash number is dynamically created for any new container and uniquely identifies it. So now, thanks to the `--volume` parameter, all existing files from the home directory and below are visible when you enter the container. In the same way, once you exit the container, any files created within the container will remain in their correspondent locations within the home directory. You can check your containers with `docker container ls`:
+>[!TIP]
+>The SHA256 hash number shown in the last line is dynamically attributed by Docker to any new container while uniquely identifying it.
+
+You can check your containers with `docker container ls`:
 ```console
 $ docker container ls
 CONTAINER ID  IMAGE                    COMMAND      CREATED          STATUS          NAMES
@@ -250,7 +251,10 @@ Now exit the container:
 ```console
 # exit
 ```
-You will find all your project files generated under `~/bx-workspaces-ci`. However they belong to root as it was the default user for the container. In order to get ownership of all generated files, perform:
+
+So now, thanks to running the container with the `--volume $HOME:/build` parameter, all existing files from the home directory and below are bound to the container's `/build` working directory. In this case, once you exit the container, any files within the `/build` directory will remain in their correspondent locations under the home directory.
+
+You will find all your project files generated in this example under `~/bx-workspaces-ci`. However they belong to root as it was the default user for the container. In order to get ownership of all generated files, perform:
 ```console
 $ sudo chown -Rv $USER:$USER bx-workspaces-ci/
 changed ownership of 'bx-workspaces-ci/LICENSE' from root:root to <user>:<user>
