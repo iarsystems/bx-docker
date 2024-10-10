@@ -224,19 +224,12 @@ The analysis results are stored in an SQLite database named `cstat.db`. Use `ics
 ```console
 # /opt/iarsystems/bxarm/arm/bin/icstat load --db $(find bx-workspaces-ci -name "cstat.db")
 "bx-workspaces-ci/library/source/crc32.c",29 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
-
 "bx-workspaces-ci/library/source/crc32.c",30 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
-
 "bx-workspaces-ci/library/source/crc32.c",31 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
-
 "bx-workspaces-ci/library/source/crc32.c",32 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
-
 "bx-workspaces-ci/library/source/crc32.c",33 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
-
 "bx-workspaces-ci/library/source/crc32.c",34 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
-
 "bx-workspaces-ci/library/source/crc32.c",35 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
-
 "bx-workspaces-ci/library/source/crc32.c",36 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
 ```
 
