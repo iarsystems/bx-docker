@@ -101,7 +101,7 @@ The IAR Build Tools require an available network license to operate.
 
 The [__`setup-license`__](setup-license) script prepares a named [Docker volume][url-docker-docs-volume] for storing persistent license configuration for any containers belonging to the same __DOCKER_HOST__. 
 
-In the bash shell, perform the following steps (replace `iarsystems/<image>:<tag>` and `<iar-license-server-ip>` by the actual ones):
+In the bash shell, perform the following step (replace `iarsystems/<image>:<tag>` and `<iar-license-server-ip>` by the actual ones):
 ```console 
 $ ~/bx-docker/setup-license iarsystems/<image>:<tag> <iar-license-server-ip>
 setup-license: Creating a Docker volume for LMS2...
