@@ -220,7 +220,7 @@ library - Release
 Analysis completed. 8 message(s)
 ```
 
-The analysis results are stored in an SQLite database named `cstat.db`. This database can be used for generating an analysis report with warnings about coding violations for the project's ruleset selection. Use `icstat` to retrieve the warnings and display them on the terminal. For example:
+The analysis results are stored in an SQLite database named `cstat.db`. Use `icstat` to retrieve the warnings and display them on the terminal. For example:
 ```console
 # /opt/iarsystems/bxarm/arm/bin/icstat load --db $(find bx-workspaces-ci -name "cstat.db")
 "bx-workspaces-ci/library/source/crc32.c",29 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
@@ -240,7 +240,7 @@ The analysis results are stored in an SQLite database named `cstat.db`. This dat
 "bx-workspaces-ci/library/source/crc32.c",36 Severity-Medium[ATH-shift-neg]:LHS argument of right shift operator may be negative. Its range is [-INF,INF].
 ```
 
-And then use `ireport` to generate an HTML report. In this example:
+The same database can be used for generating an analysis report with warnings about coding violations for the project's ruleset selection. Use `ireport` to generate an HTML report. In this example:
 ```console
 # /opt/iarsystems/bxarm/arm/bin/ireport --full --project library --db $(find bx-workspaces-ci -name "cstat.db")
 HTML report generated: library.html
@@ -254,6 +254,7 @@ You will find all your project files generated under `~/bx-workspaces-ci`. Howev
 ```console
 $ sudo chown -Rv $USER:$USER bx-workspaces-ci/
 changed ownership of 'bx-workspaces-ci/LICENSE' from root:root to felipeto:felipeto
+...
 ```
 
 
