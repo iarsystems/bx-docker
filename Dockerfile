@@ -23,15 +23,21 @@ ENV  LC_ALL=C \
      HOME=/build
 
 #
-# Copy from the Docker context to /tmp
+# Allows specific image name to be copied from the Docker context
 #
-COPY bx*.deb /tmp
+ARG BX_PACKAGE_DEB=bx*.deb
+
+#
+# Copy the installer package from the Docker context to /tmp
+#
+COPY ${BX_PACKAGE_DEB}.deb /tmp
 
 #
 # Install the necessary packages and cleanup
 #  sudo                      : required by earlier versions of bx*.deb
 #  libsqlite3-0              : required by iarbuild
 #  libxml2, tzdata           : required by C-STAT
+#  git                       : added for convenience
 #
 RUN  apt-get update && \
      apt-get install -y sudo libsqlite3-0 libxml2 tzdata git && \

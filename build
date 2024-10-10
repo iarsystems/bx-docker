@@ -58,8 +58,9 @@ function _bx_build_docker_image()
   #cp -v "${PKG_PATH}/${PKG_FILE}" "${SCRIPT_PATH}"
 
   echo -- Building the Docker image for ${PKG_NAME,,}-${PKG_VERSION}...
-  docker build --tag iarsystems/${PKG_NAME}:${PKG_VERSION} \
-               ${SCRIPT_PATH}
+  docker buildx build --tag iarsystems/${PKG_NAME}:${PKG_VERSION} \
+                      --build-arg BX_PACKAGE_DEB=${PKG_FILE} \
+                      ${SCRIPT_PATH}
 
   # Cleanup               
   #rm "${SCRIPT_PATH}/${PKG_FILE}" 2>/dev/null
