@@ -15,13 +15,13 @@ This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provid
 To complete this tutorial you need:
 - An understanding of how to use command line tools.
 ### IAR Build Tools
-A [__IAR Build Tools__][url-iar-bx] installer package of your choice for Ubuntu(/Debian) in the `.deb` format, which IAR customers can download it directly from [IAR MyPages](https://iar.my.site.com/mypages).
+A [__IAR Build Tools__][url-iar-bx] installer package of your choice for Ubuntu(/Debian) in the `.deb` format, which IAR customers with a license can download directly from [IAR MyPages](https://iar.my.site.com/mypages). If you do not have a license yet, [contact IAR Sales](https://iar.com/about/contact).
 
 The IAR Build Tools installer packages are delivered using the following name standard:
 ```
 bx<arch>[fs]-<V.vv.patch[.build]>.deb
 ```
-where `[fs]` and `[.build]` in the package names show up to distinguish tools that are pre-certified for [Functional Safety](https://iar.com/fusa).
+where `[fs]` and `[.build]` in the package names show up to distinguish tools that come pre-certified for [Functional Safety](https://iar.com/fusa).
 
 ### Docker Engine
 A __x86_64/amd64__ platform supported by the Docker Engine ([supported platforms](https://docs.docker.com/engine/install/#supported-platforms)) capable of accessing the Internet for downloading the necessary packages.
