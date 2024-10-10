@@ -34,7 +34,7 @@ COPY bx*.deb /tmp
 #  libxml2, tzdata           : required by C-STAT
 #
 RUN  apt-get update && \
-     apt-get install -y sudo libsqlite3-0 libxml2 tzdata && \
+     apt-get install -y sudo libsqlite3-0 libxml2 tzdata git && \
      apt-get install -y /tmp/bx*.deb && \
      apt-get clean autoclean autoremove && \
      rm -rf /var/lib/apt/lists/* /tmp/*.deb

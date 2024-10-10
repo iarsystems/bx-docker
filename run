@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (c) 2020-2022 IAR Systems AB
+# Copyright (c) 2020-2024 IAR Systems AB
 #
 # Run a container with the IAR Build Tools
 #
@@ -9,19 +9,19 @@
 #
 
 function _bx_show_help() {
-  echo "Usage: ${BASH_SOURCE[0]} iarsystems/bx<package>:<version>"
+  echo "Usage: ${BASH_SOURCE[0]} iarsystems/bx<package>:<version> <container-name>"
   echo " "
 }
 
 function _bx_run_container()
 {
   if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
-    echo "ERROR: the script should be executed directly. Do not source." >&2
+    echo "ERROR: The script should be executed directly. Do not source." >&2
     _bx_show_help
     return 1
   fi
   
-  if [ $# -lt 1 ]; then
+  if [ $# -lt 2 ]; then
     _bx_show_help
     return 1
   fi
@@ -29,7 +29,7 @@ function _bx_run_container()
   local SCRIPT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
   local IMAGE_PACKAGE=$( echo ${1} | cut -d/ -f2 | cut -d: -f1 )
   local IMAGE_VERSION=$( echo ${1} | cut -d: -f2 ) 
-
+  
   declare -a BX_DOCKER_IMAGES_LIST=( $(docker images --filter "reference=iarsystems/${IMAGE_PACKAGE}:${IMAGE_VERSION}" -q --format "{{.Repository}}:{{.Tag}}" ) )
 
   if [ -z ${BX_DOCKER_IMAGES_LIST} ]; then
@@ -37,13 +37,16 @@ function _bx_run_container()
     return 1
   fi
   
-  echo -- Running a Docker container for ${IMAGE_PACKAGE,,}-${IMAGE_VERSION}...
-  CONTAINER_ID=$( docker run --detach \
-	                     --hostname `hostname` \
-	                     --tty \
-	                     --volume LMS2:/usr/local/etc/IARSystems \
-	                     --volume `pwd`:/build \
-	                     ${1})
+  echo -- Starting Running a container for ${IMAGE_PACKAGE,,}-${IMAGE_VERSION}...
+  CONTAINER_ID=$( docker run \
+                      --detach \
+                      --tty \
+	                    --hostname `hostname` \
+                      --restart=unless-stopped \
+	                    --name ${2} \
+	                    --volume LMS2:/usr/local/etc/IARSystems \
+	                    --volume `pwd`:/build \
+	                    ${1})
 
   echo "-- The working directory is `pwd`."
   echo " "
