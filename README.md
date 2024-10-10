@@ -39,7 +39,7 @@ The [__IAR License Server__](https://links.iar.com/lms2-server) ready to serve, 
 ## Installing Docker
 To install the Docker Engine on the __DOCKER_HOST__, follow the [official instructions][url-docker-docs-install].
 
-Alternatively, launch a new bash shell and use the following procedure, known to work for most __DOCKER_HOST__s:
+Alternatively, launch a new bash shell and use the following procedure, known to work for most cases:
 ```bash
 sudo apt update
 sudo apt install curl
