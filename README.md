@@ -244,7 +244,7 @@ Now exit the container:
 # exit
 ```
 
-So now, thanks to running the container with the `--volume $HOME:/build` parameter, all existing files from the home directory and below are bound to the container's `/build` working directory. In this case, once you exit the container, any files within the `/build` directory will remain in their correspondent locations under the home directory.
+Thanks to running the container with the `--volume $HOME:/build` parameter, all existing files from the home directory and below are bound to the container's `/build` working directory. In this case, once you exit the container, any files within the `/build` directory will remain in their correspondent locations under the home directory.
 
 You will find all your project files generated in this example under `~/bx-workspaces-ci`. However they belong to root as it was the default user for the container. In order to get ownership of all generated files, perform:
 ```console
