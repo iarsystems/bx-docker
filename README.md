@@ -116,8 +116,8 @@ In this section, you will run an interactive container locally, clone and build 
 
 The following command line will bind the home directory (`$HOME`) to the "my-iar-bx-container" container's working directory (`/build`) for the `iarsystems/bx<image>:<tag>` image.
 
-```console
-$ docker run \
+```bash
+docker run \
   --restart=unless-stopped \
   --detach \
   --tty \
@@ -126,7 +126,6 @@ $ docker run \
   --volume LMS2:/usr/local/etc/IARSystems \
   --volume $HOME:/build \
   iarsystems/bx<image>:<tag>
-2108d5fba0b345913efd5effe2388ff87120c555ded79236cb5b3ff34f59203d  
 ```
 >[!TIP]
 >The SHA256 hash number shown in the last line is dynamically attributed by Docker to any new container while uniquely identifying it.
@@ -262,6 +261,10 @@ changed ownership of 'bx-workspaces-ci/tests/test-crc32.c' from root:root to <us
 changed ownership of 'bx-workspaces-ci/tests/test-crc16.c' from root:root to <user>:<user>
 ...
 ```
+
+>[!TIP]
+>Since the container was run with the `--restart=unless-stopped` option, it will remain available for reattaching to it when desired, by using `docker exec -it my-iar-bx-container bash`, until it is manually stopped with `docker stop my-iar-bx-container`.
+
 
 
 ## Summary
