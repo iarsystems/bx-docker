@@ -12,10 +12,12 @@ This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provid
 > We recommended that you initially perform this tutorial within a test environment.
 
 ## Pre-requisites
-To complete this tutorial you need:
-- An understanding of how to use command line tools.
+
+### Command line basics
+To get the most of this tutorial, you will need a basic understanding on how to use command line tools.
+
 ### IAR Build Tools
-A [__IAR Build Tools__][url-iar-bx] installer package of your choice for Ubuntu(/Debian) in the `.deb` format, which IAR customers with a license can download directly from [IAR MyPages](https://iar.my.site.com/mypages). If you do not have a license yet, [contact IAR Sales](https://iar.com/about/contact).
+A [__IAR Build Tools__][url-iar-bx] installer package of your choice for Ubuntu(/Debian) in the `.deb` format. IAR customers with a license can download directly from [IAR MyPages](https://iar.my.site.com/mypages). If you do not have a license yet, [contact IAR Sales][url-iar-contact].
 
 The IAR Build Tools installer packages are delivered using the following name standard:
 ```
@@ -27,9 +29,10 @@ where `[fs]` and `[.build]` in the package names show up to distinguish tools th
 A __x86_64/amd64__ platform supported by the Docker Engine ([supported platforms](https://docs.docker.com/engine/install/#supported-platforms)) capable of accessing the Internet for downloading the necessary packages.
 > [!NOTE]
 > In this guide, network node in which the Docker Engine was installed will be referred to as `DOCKER_HOST`.
-### IAR License Server (LMS2 Technology)
-An [__IAR License Server__](https://links.iar.com/lms2-server)
-- ready to serve, up and running, with __activated__ license(s) for one or more network nodes running the __IAR Build Tools__ of your choice -and-
+
+### IAR License Server
+The [__IAR License Server__](https://links.iar.com/lms2-server)
+- ready to serve, up and running, with __activated__ license(s) for the network nodes with the __IAR Build Tools__ of your choice -and-
 - reachable from the platform in which the `DOCKER_HOST` is running as described above.
 > [!TIP]
 > If you do not have the licenses you need, [__contact us__][url-iar-contact].
@@ -38,18 +41,18 @@ An [__IAR License Server__](https://links.iar.com/lms2-server)
 ## Installing Docker
 To install the Docker Engine on the `DOCKER_HOST`, follow the [official instructions][url-docker-docs-install].
 
-Alternatively, use this procedure that should work for most `DOCKER_HOST`s:
-| __Linux (Bash)__ | __Windows__ |
-| --------- | ----------- |
-| `curl -fsSL https://get.docker.com -o get-docker.sh`<br>`sh ./get-docker.sh` | Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) |
+Alternatively, launch a new bash shell and use the following procedure, known to work for most `DOCKER_HOST`s:
+```bash
+sudo apt update
+sudo apt install curl
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh ./get-docker.sh
+sudo usermod -aG docker $USER
+sudo - $USER
+```
 
-> [!NOTE]
-> On Windows hosts, make sure that Docker Desktop is set up to run Linux Containers (default).
-
-To execute Docker commands, the current user (`$USER`) must be in the `docker` group. Execute:
-| __Linux (Bash)__ | __Windows__ |
-| --------- | :-----------: |
-| `sudo usermod -aG docker $USER`<br>Then log out and log in again for the changes to take effect. | N/A |
+>[!TIP]
+>If you want to use Docker Desktop on Windows, refer to the [wiki](https://github.com/iarsystems/bx-docker/wiki).
 
 
 ## Building a Docker image
@@ -59,32 +62,38 @@ This [__Dockerfile__](Dockerfile) was created as a universal template to build i
 
 The [__`build`__](build) script will use the [`docker build`][url-docker-docs-build] command with the Dockerfile, together with an installer package (__bx`<package>`-`<version>`.deb__), to create one image.
 
-To build the image, clone the [bx-docker][url-repo] repository to the user's home directory:
-| __Linux (Bash)__ | __Windows (PowerShell)__ |
-| --------- | ----------- |
-| `git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker` | `git clone https://github.com/iarsystems/bx-docker.git $home/bx-docker` |
-
-Then, invoke the __`build`__ script that points to the installer package:
-| __Linux (Bash)__ | __Windows (PowerShell)__ |
-| --------- | ----------- |
-| `~/bx-docker/build /path/to/bx<package>-<version>.deb` | `./bx-docker/build /path/to/bx<package>-<version>.deb` |
+To build the image, you need to perform these three steps:
+1. Set an environment variable with the download URL to the installer package you received from IAR Customer Support (set `BX_DOWNLOAD_URL` to the correct address).
+```bash
+export BX_DOWNLOAD_URL=<fill-with-the-download-URL>
+```
+2. Clone the [bx-docker][url-repo] repository to the user's home directory.
+```bash
+sudo apt update
+sudo apt install git
+git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker
+```
+3. Invoke the __`build`__ script pointing to the downloaded installer package:
+```bash
+cd ~/bx-docker
+curl -fO $BX_DOWNLOAD_URL
+./build ${BX_DOWNLOAD_URL##*/}
+```
 
 Depending on your system's properties, it might take a while to build the image. The build time ranges from seconds to a few minutes. In the end, the __`build`__ script will automatically tag the image as __iarsystems/bx`<package>`:`<version>`__.
 
 > [!TIP]
-> Invoke the __`build`__ script once for each installer package you have, to get one dedicated image for each package.
+> The Docker image only needs to be built once. If you use multiple packages for different targets/versions, repeat the process to build a dedicated docker image for each package.
 
-Once you have created the image, execute the [`docker images`][url-docker=docs-images] command to list all created images:
+Once you have created your images, execute the [`docker images iarsystems/*`][url-docker=docs-images] command to list all created images:
+```console
+$ docker images iarsystems/*
+REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE
+iarsystems/bxarm                   9.60.2              0f9ce7a7fde4        1 minute ago        4.18GB
+iarsystems/bxarm                   9.40.1              93eb28dd4e65        9 days ago          3.17GB
+iarsystems/bxarmfs                 9.20.3.59432        abc420034fcb        6 weeks ago         2.45GB
+iarsystems/bxriscv                 3.20.1              89bd0878856f        8 weeks ago         1.46GB
 ```
-docker images iarsystems/*
-```
-The output will be similar to this, depending on which images you have created:
->```
->REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE
->iarsystems/bxarm                   9.40.1              93eb28dd4e65        2 minutes ago       3.17GB
->iarsystems/bxarmfs                 9.20.3.59432        abc420034fcb        8 minutes ago       2.45GB
->iarsystems/bxriscv                 3.20.1              89bd0878856f        About an hour ago   1.46GB
->```
 
 
 ## Setting up the license
