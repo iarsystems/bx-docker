@@ -137,9 +137,6 @@ CONTAINER ID  IMAGE                    COMMAND      CREATED          STATUS     
 dcc6c9f4e104  iarsystems/bxarm:9.60.2  "/bin/bash"  30 seconds ago   Up 29 seconds   my-iar-bx-container
 ```
 
-> [!TIP]
-> The `docker run --help` command provides more information.
-
 Enter the container:
 ```console
 $ docker exec -it my-iar-bx-container bash
@@ -256,7 +253,7 @@ changed ownership of 'bx-workspaces-ci/tests/test-crc16.c' from root:root to <us
 ```
 
 >[!TIP]
->Since the container was run with the `--restart=unless-stopped` option, it will remain available for reattaching to it when desired, by using `docker exec -it my-iar-bx-container bash`, until it is manually stopped with `docker stop my-iar-bx-container`.
+>Since the container was run with the `--restart=unless-stopped` option, it will remain available for reattaching to it when desired, by using `docker exec -it my-iar-bx-container bash`, until it is manually stopped with `docker stop my-iar-bx-container`. The `docker run --help` command provides more information on different ways of running docker containers.
 
 
 
