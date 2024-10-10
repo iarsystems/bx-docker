@@ -88,6 +88,7 @@ Once you have created your images, execute the [`docker images iarsystems/*`][ur
 $ docker images iarsystems/*
 REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE
 iarsystems/bxarm                   9.60.2              0f9ce7a7fde4        1 minute ago        4.18GB
+iarsystems/bxarmfs                 9.50.3.71393        102c086a58df        5 minutes ago       3.75GB
 iarsystems/bxarm                   9.40.1              93eb28dd4e65        9 days ago          3.17GB
 iarsystems/bxarmfs                 9.20.3.59432        abc420034fcb        6 weeks ago         2.45GB
 iarsystems/bxriscv                 3.20.1              89bd0878856f        8 weeks ago         1.46GB
