@@ -99,18 +99,20 @@ iarsystems/bxriscv                 3.20.1              89bd0878856f        8 wee
 ## Setting up the license
 The IAR Build Tools require an available network license to operate.
 
-To set up the license for all the containers in the `DOCKER_HOST`, execute the [__`setup-license`__](setup-license) script, pointing to the image's `<tagname:version>` followed by the IAR LMS2 License Server's IP address:
-| __Linux (Bash)__ | __Windows (PowerShell)__ |
-| ---------------- | ------------------------ |
-| `~/bx-docker/setup-license iarsystems/bx<package>:<version> <lms2-server-ip>` | `./bx-docker/setup-license iarsystems/bx<package>:<version> <lms2-server-ip>` |
+The [__`setup-license`__](setup-license) script prepares a named [Docker volume][url-docker-docs-volume] for storing persistent license configuration for any containers belonging to the same __DOCKER_HOST__. 
 
-The __`setup-license`__ script will prepare a [Docker volume][url-docker-docs-volume] to be shared by all containers that run on the `DOCKER_HOST`, for persistent storage of the license configuration.
+In the bash shell, perform the following steps (replace `iarsystems/<image>:<tag>` and `<iar-license-server-ip>` by the actual ones):
+```console 
+$ ~/bx-docker/setup-license iarsystems/<image>:<tag> <iar-license-server-ip>
+setup-license: Creating a Docker volume for LMS2...
+LMS2
+9825affb94394ea88e10a49da75d2baf9bcc5516f03ab7bded66e9fc6397ecdb
+bx-license-setup
+setup-license: LMS2 license setup completed.
+```
 
 > [!TIP]
->  This step can only be performed once. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed.
->
-> If your network has multiple build nodes (`DOCKER_HOST`s), __`setup-license`__ must be run __individually__ on all of them.
-
+>  Setting up the license for a Docker image in such a way only needs to be performed once per __DOCKER_HOST__. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed. For manually removing a named volume, use `docker volume rm <volume-name>`.
 
 ## Running a container
 In this section, you will use the image you created to run a container so that you can build a project later.
