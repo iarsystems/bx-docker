@@ -30,7 +30,7 @@ ARG BX_PACKAGE_DEB=bx*.deb
 #
 # Copy the installer package from the Docker context to /tmp
 #
-COPY ${BX_PACKAGE_DEB}.deb /tmp
+COPY ${BX_PACKAGE_DEB} /tmp
 
 #
 # Install the necessary packages and cleanup
