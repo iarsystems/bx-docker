@@ -54,46 +54,55 @@ sudo - $USER
 
 
 ## Building a Docker image
-Before you can run a Docker container, you need a Docker image that contains the required environment. A Dockerfile contains instructions that describe how to build an image .
+Before you can run a container, you need a image containing the required environment. A Dockerfile is a text file that describe how to build a container image.
 
-This [__Dockerfile__](Dockerfile) was created as a universal template to build images with the IAR Build Tools.
+The [__`build`__](build) script in this repository works as a frontend for building a container image based on this [__Dockerfile__](Dockerfile) and requires an installer package (__bx`<package>`-`<version>`.deb__).
 
-The [__`build`__](build) script will use the [`docker build`][url-docker-docs-build] command with the Dockerfile, together with an installer package (__bx`<package>`-`<version>`.deb__), to create one image.
-
-To build the image, you need to perform these three steps:
-1. Set `BX_DOWNLOAD_URL` with the download link to the installer package you received from IAR Customer Support during your on-boarding process.
-```bash
-export BX_DOWNLOAD_URL=<fill-with-the-download-URL>
-```
-2. Clone the [bx-docker][url-repo] repository to the user's home directory.
-```bash
-sudo apt update
-sudo apt install git
-git clone https://github.com/iarsystems/bx-docker.git ~/bx-docker
-```
-3. Invoke the __`build`__ script pointing to the downloaded installer package:
-```bash
-cd ~/bx-docker
-curl -fO $BX_DOWNLOAD_URL
-./build ${BX_DOWNLOAD_URL##*/}
-```
-
-Depending on your system's properties, it might take a while to build the image. The build time ranges from seconds to a few minutes. In the end, the __`build`__ script will automatically tag the image as __iarsystems/bx`<package>`:`<version>`__.
-
-> [!TIP]
-> The Docker image only needs to be built once. If you use multiple packages for different targets/versions, repeat the process to build a dedicated docker image for each package.
-
-Once you have created your images, execute the [`docker images iarsystems/*`][url-docker=docs-images] command to list all created images:
 ```console
-$ docker images iarsystems/*
-REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE
-iarsystems/bxarm                   9.60.2              0f9ce7a7fde4        1 minute ago        4.18GB
-iarsystems/bxarmfs                 9.50.3.71393        102c086a58df        5 minutes ago       3.75GB
-iarsystems/bxarm                   9.40.1              93eb28dd4e65        9 days ago          3.17GB
-iarsystems/bxarmfs                 9.20.3.59432        abc420034fcb        6 weeks ago         2.45GB
-iarsystems/bxriscv                 3.20.1              89bd0878856f        8 weeks ago         1.46GB
+$ build -h
+ 
+     IAR Container Image Build Utility V2025.02
+     Copyright 2020-2025 IAR Systems AB.
+ 
+ Usage:
+ build -m /path/to/bx<package>.deb [options]
+ build -u https://url.to.iar.com/.../bx<package>.deb [options]
+ 
+ Parameter:                   Description:
+ -m, --main-package <file>    The main package.
+                              (ex: /path/to/bxarm-9.60.3.deb)
+ -u, --url <URL>              Download package.
+                              (ex: https://url.to/.../bxarm-9.60.3.deb)
+ -h, --help                   Show help information.
+ -v, --version                Show utility version.
+ 
+ Option:                      Description:
+ -p, --device-package <file>  The C-SPY device support package.
+                              (ex: /path/to/bxarm-cspy-device-support-9.60.3.deb)
+ -b, --base [18|20|22|24]     Choose Ubuntu Linux base image LTS version.
+                              (Default: 20)
+ -t, --tag <name:version>     Create an image with customized tag.
+                              (Default: iarsystems/bx<package>:<version>)
+ -z, --no-cache               Build a container image from scratch.
+ 
+ Experimental:                Description:
+ -c, --with-cmake             Include `cmake` in the container image.
+ -g, --with-git               Include `git` in the container image.
+ -r, --with-sudo              Include `sudo` in the container image.
+ -q, --no-cmsis               Exclude `arm/CMSIS` from the container image (up to -129M).
+ -n, --no-docs                Exclude `<target>/doc` from the container image (up to -64M).
+ -s, --no-source              Exclude `<target>/src` from the container image (up to -318M).
+ -o, --no-translation         Exclude localization files from the container image (up to -20M).
 ```
 
+The `build` script requires at least one of the following parameters:
+- the `--main-package /path/to/bx<package>.deb` pointing to a local copy of the `*.deb` installer which was already downloaded -or-
+- the `--url https://url.to/.../bx<package>.deb` pointing to the download link of the `*.deb` installer.
+
+Depending on your system specifications, chosen options and installer size, it might take a little while to build an image. In the end, the __`build`__ script will automatically tag the image as __iarsystems/bx`<package>`:`<version>`__ unless specified otherwise.
+
+>[!NOTE]
+> When building an image, it is safe to ignore eventual `debconf: delaying package configuration, since apt-utils is not installed` warning messages.
 
 ## Setting up the license
 The IAR Build Tools require an available network license to operate.
@@ -135,7 +144,7 @@ You can check your containers with `docker container ls`:
 ```console
 $ docker container ls
 CONTAINER ID  IMAGE                    COMMAND      CREATED          STATUS          NAMES
-dcc6c9f4e104  iarsystems/bxarm:9.60.2  "/bin/bash"  30 seconds ago   Up 29 seconds   my-iar-bx-container
+1ab6d432393b  iarsystems/bxarm:9.60.3  "/bin/bash"  12 seconds ago   Up 11 seconds   my-iar-bx-container
 ```
 
 Enter the container:
@@ -161,7 +170,7 @@ Finally build the library project for the selected `<target>` (e.g. arm, avr, ri
 ```console
 # /opt/iarsystems/bxarm/common/bin/iarbuild bx-workspaces-ci/targets/arm/library.ewp -build Release
 
-     IAR Command Line Build Utility V9.3.5.863
+     IAR Command Line Build Utility V9.3.6.958
      Copyright 2002-2024 IAR Systems AB.
 
 
@@ -182,7 +191,7 @@ Now build the application project that is linked against the library for the sam
 ```console
 # /opt/iarsystems/bxarm/common/bin/iarbuild bx-workspaces-ci/targets/arm/test-crc32.ewp -build Release
 
-     IAR Command Line Build Utility V9.3.5.863
+     IAR Command Line Build Utility V9.3.6.958
      Copyright 2002-2024 IAR Systems AB.
 
 
@@ -209,7 +218,7 @@ Using the library project in `bx-workspaces-ci/targets/arm` as an example:
 ```console
 # /opt/iarsystems/bxarm/common/bin/iarbuild bx-workspaces-ci/targets/arm/library.ewp -cstat_analyze Release
 
-     IAR Command Line Build Utility V9.3.5.863
+     IAR Command Line Build Utility V9.3.6.958
      Copyright 2002-2024 IAR Systems AB.
 
 
@@ -250,7 +259,7 @@ $ sudo chown -Rv $USER:$USER bx-workspaces-ci/
 changed ownership of 'bx-workspaces-ci/LICENSE' from root:root to <user>:<user>
 changed ownership of 'bx-workspaces-ci/tests/test-crc32.c' from root:root to <user>:<user>
 changed ownership of 'bx-workspaces-ci/tests/test-crc16.c' from root:root to <user>:<user>
-...
+[...]
 ```
 
 >[!TIP]

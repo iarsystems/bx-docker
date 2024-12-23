@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+# Copyright (c) 2020-2025 IAR Systems AB
+# See LICENSE for detailed license information
+# 
+# Bash autocompletion for `icstat` 
+#
+
+_icstat()
+{
+ local cur prev words cword split 
+  _init_completion -s -n : || return
+
+  case $prev in
+    --checks)
+      _filedir  
+      return;;
+    --db)
+      _filedir db
+      return;;
+    --exclude)
+      _filedir
+      return;;
+    --fpe)
+      ;;
+    --language_specific_checks)
+      return;;
+    --parallel)
+      COMPREPLY=( $(compgen -W "{1..$(_ncpus)}" -- "${cur}") )
+      return;;
+    analyze|link_analyze)
+      COMPREPLY=--
+      return;;
+    commands)
+      _filedir
+      return;;
+  esac
+
+  ${split} && return
+
+  case ${cur} in
+    -*)
+      COMPREPLY=( $(compgen -W '$(_parse_help "$1")' -- "${cur}") )
+      ;;
+    a*)
+      COMPREPLY=( $(compgen -W 'analyze a*' -- "${cur}") )
+      ;;
+    l*)
+      COMPREPLY=( $(compgen -W 'load link_analyze l*' -- "${cur}") )
+      ;;
+    c*)
+      COMPREPLY=( $(compgen -W 'commands clear c*' -- "${cur}") )
+      ;;
+    *)
+      [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+      return;;
+  esac
+}
+complete -F _icstat icstat
+

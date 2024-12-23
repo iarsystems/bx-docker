@@ -1,70 +1,318 @@
 #!/bin/bash
 
 #
-# Copyright (c) 2020-2022 IAR Systems AB
+# Copyright (c) 2020-2025 IAR Systems AB
 #
-# build
-#
-# Build a Docker image containing the IAR Build Tools
+# `build` - builds a container image with the IAR Build Tools (BX)
 #
 # See LICENSE for detailed license information
 #
 
+SCRIPT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
+SCRIPT_NAME=${BASH_SOURCE[0]#./}
+SCRIPT_VERSION=2025.02
+DOCKER_CONTEXT=${SCRIPT_PATH}
+BX_DEFAULT_UBUNTU_VERSION=20.04
+BX_DEFAULT_TAG_PREFIX="iarsystems/"
+BX_CONTEXT_COPY=0
+BX_DEV_CONTEXT_COPY=0
+BX_INCLUDE_CMAKE=0
+BX_INCLUDE_GIT=0
+BX_INCLUDE_SUDO=0
+BX_EXCLUDE_CMSIS=0
+BX_EXCLUDE_DOCS=0
+BX_EXCLUDE_SRC=0
+BX_EXCLUDE_JPN_FILES=0
+
 function _bx_show_help() {
-  echo "Usage: ${BASH_SOURCE[0]} /path/to/bx<package>.deb"
+  echo " "
+  echo "     IAR Container Image Build Utility V${SCRIPT_VERSION}"
+  echo "     Copyright 2020-2025 IAR Systems AB."
+  echo " "
+  echo " Usage:"
+  echo " ${SCRIPT_NAME} -m /path/to/bx<package>.deb [options]"
+  echo " ${SCRIPT_NAME} -u https://url.to.iar.com/.../bx<package>.deb [options]"
+  echo " "
+  echo " Parameter:                   Description:"
+  echo " -m, --main-package <file>    The main package."
+  echo "                              (ex: /path/to/bxarm-9.60.3.deb)"
+  echo " -u, --url <URL>              Download package."
+  echo "                              (ex: https://url.to/.../bxarm-9.60.3.deb)"
+  echo " -h, --help                   Display help information."
+  echo " -v, --version                Display utility version."
+  echo " "
+  echo " Option:                      Description:"
+  echo " -p, --device-package <file>  The C-SPY device support package."
+  echo "                              (ex: /path/to/bxarm-cspy-device-support-9.60.3.deb)"
+  echo " -b, --base [18|20|22|24]     Choose Ubuntu Linux base image LTS version."
+  echo "                              (Default: 20)"
+  echo " -t, --tag <name:version>     Create an image with customized tag."
+  echo "                              (Default: iarsystems/bx<package>:<version>)"
+  echo " -z, --no-cache               Build a container image from scratch."
+  echo " "
+  echo " Experimental:                Description:"
+  echo " -c, --with-cmake             Include \`cmake\` in the container image."
+  echo " -g, --with-git               Include \`git\` in the container image."
+  echo " -r, --with-sudo              Include \`sudo\` in the container image."
+  echo " -q, --no-cmsis               Exclude \`arm/CMSIS\` from the container image (up to -129M)."
+  echo " -n, --no-docs                Exclude \`<target>/doc\` from the container image (up to -64M)."
+  echo " -s, --no-source              Exclude \`<target>/src\` from the container image (up to -318M)."
+  echo " -o, --no-translation         Exclude localization files from the container image (up to -25M)."
   echo " "
 }
 
-function _bx_build_docker_image()
-{
-  if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
-    echo "ERROR: the script should be executed directly. Do not source." >&2
-    _bx_show_help
-    return 1
-  fi
-  
-  if [ $# -lt 1 ]; then
-    _bx_show_help
-    return 1
-  fi
-  
-  local SCRIPT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
-  local PKG_PATH=$(dirname $1)
-  local PKG_FILE=$(basename $1)
-  local PKG_BASE=${PKG_FILE%.deb}
-  local PKG_NAME=$(echo $PKG_BASE | cut -d- -f1)
-  local PKG_VERSION=$(echo $PKG_BASE | cut -d- -f2)
-
-  if [ ! -f "${PKG_PATH}/${PKG_FILE}" ]; then
-    echo "ERROR: file [${1}] not found." >&2
-    _bx_show_help
-    return 1
-  fi
-
-  case ${PKG_NAME^^} in
-    BXARM) local BX_ARCH=arm;;
-    BXARMFS) local BX_ARCH=arm;;
-    BXRH850) local BX_ARCH=rh850;;
-    BXRH850FS) local BX_ARCH=rh850;;
-    BXRISCV) local BX_ARCH=riscv;;
-    BXRISCVFS) local BX_ARCH=riscv;;
-    BXRL78) local BX_ARCH=rl78;;
-    BXRX) local BX_ARCH=rx;;
-    BXAVR) local BX_ARCH=avr;;
-    *) echo "ERROR: invalid package. (${PKG_NAME^^})" >&2; _bx_show_help; return 1;;
-  esac
-  
-  # Copy the installer package to the Docker context
-  #cp -v "${PKG_PATH}/${PKG_FILE}" "${SCRIPT_PATH}"
-
-  echo -- Building the Docker image for ${PKG_NAME,,}-${PKG_VERSION}...
-  docker buildx build --tag iarsystems/${PKG_NAME}:${PKG_VERSION} \
-                      --build-arg BX_PACKAGE_DEB=${PKG_FILE} \
-                      ${SCRIPT_PATH}
-
-  # Cleanup               
-  #rm "${SCRIPT_PATH}/${PKG_FILE}" 2>/dev/null
+function _bx_show_version() {
+  echo "${SCRIPT_VERSION}"
 }
-_bx_build_docker_image $@
-unset -f _bx_build_docker_image
-unset -f _bx_show_help
+
+red() { printf "\e[31m"; printf "ERROR: "; reset; }
+reset() { printf "\e[0m"; }
+yellow() { printf "\e33m"; printf "WARNING: "; reset; }
+
+function _check_curl() {
+  if ! which curl &> /dev/null; then
+    red; echo "the -u parameter requires \`curl\` installed."
+    echo "       Install \`curl\` with: sudo apt install curl."
+    echo " "
+    exit 1
+  fi
+}
+
+function _check_docker() {
+  if docker images &> /dev/null; then
+    DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+    DOCKER_EXECUTABLE=$(which docker)
+    echo "-- Using: ${DOCKER_EXECUTABLE} (v${DOCKER_VERSION})..."
+    DOCKER_CL=$(echo "docker build")
+  else
+    red; printf "%s requires \`docker\` for the current user ($USER).\n" "${SCRIPT_NAME}";
+    echo "       Make sure you have it installed:"
+    echo "       curl -fsSL https://get.docker.com -o get-docker.sh"
+    echo "       sh ./get-docker.sh"
+    echo "       sudo usermod -aG docker \$USER"
+    echo "       sudo - \$UESR"
+    echo " "
+    exit 1
+  fi
+}
+
+
+if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
+  red; printf "do not source. %s must be executed directly. (%s -h for help)\n" "${SCRIPT_NAME}" "${SCRIPT_NAME}" >&2
+  return 1
+fi
+
+while [ $# -gt 0 ]; do
+  case "${1}" in
+    -h|--help)
+      _bx_show_help;
+      exit 0
+      ;;
+    -v|--version)
+      _bx_show_version;
+      exit 0
+      ;;
+    -m|--main-package)
+      if [ ! -f "${2}" ]; then
+        red; echo "expected parameter \`--main-package\`."
+        echo "       File not found \`$2\`. (${SCRIPT_NAME} -h for help)"
+        exit 1
+      fi
+      BX_DEB_PATH=$(dirname ${2})
+      BX_DEB_FILE=$(basename ${2})
+      BX_PKG_BASE=${BX_DEB_FILE%.deb}
+      BX_PKG_NAME=$(echo ${BX_PKG_BASE,,} | cut -d- -f1)
+      BX_PKG_VERSION=$(echo ${BX_PKG_BASE} | cut -d- -f2)
+      BX_PKG_PKG=${BX_PKG_NAME#bx}
+      BX_PKG_ARCH=${BX_PKG_PKG%fs}
+      if [ ! -f ${DOCKER_CONTEXT}/${BX_DEB_FILE} ]; then
+        echo " -- Copying \`${BX_DEB_FILE}\` to the context..."
+        cp ${2} ${DOCKER_CONTEXT}
+        BX_CONTEXT_COPY=1
+      fi
+      shift
+      ;;
+   -p|--device-package)
+      if [ ! -f "${2}" ]; then
+        red; echo "expected parameter \`--device-package\`."
+        echo "       File not found \`$2\`. (${SCRIPT_NAME} -h for help)"
+        exit 1
+      fi
+      BX_DEV_DEB_PATH=$(dirname ${2})
+      BX_DEV_DEB_FILE=$(basename ${2})
+      BX_DEV_PKG_BASE=${BX_DEV_DEB_FILE%.deb}
+      if [ ! -f ${DOCKER_CONTEXT}/${BX_DEV_DEB_FILE} ]; then
+        echo " -- Copying \`${BX_DEV_DEB_FILE}\` to the context..."
+        cp ${2} ${DOCKER_CONTEXT}
+        BX_DEV_CONTEXT_COPY=1
+      fi
+      shift
+      ;;
+    -u|--url)
+      case "${2}" in
+        -*|--*|"")
+          red; echo "expected parameter \`--url\`. (${SCRIPT_NAME} -h for help)."
+          exit 1
+          ;;
+      esac
+      _check_curl;
+      CURL_DL_PACKAGE_NAME=$(basename ${2})
+      if [ ! -f "${SCRIPT_PATH}/${CURL_DL_PACKAGE_NAME}" ]; then
+        echo "-- Downloading: ${CURL_DL_PACKAGE_NAME} (using $(which curl))..."
+        if ! curl --fail --silent -o ${SCRIPT_PATH}/${CURL_DL_PACKAGE_NAME} "${2}"; then
+          red; echo "failed to download a package from"
+          echo "       \`${2}\`."
+          exit 1
+        fi
+      fi
+      if [[ ! ${CURL_DL_PACKAGE_NAME} == *"-cspy-device-support-"* ]]; then
+        BX_DEB_PATH=${SCRIPT_PATH}
+        BX_DEB_FILE=${CURL_DL_PACKAGE_NAME}
+        BX_PKG_BASE=${BX_DEB_FILE%.deb}
+        BX_PKG_NAME=$(echo ${BX_PKG_BASE,,} | cut -d- -f1)
+        BX_PKG_VERSION=$(echo ${BX_PKG_BASE} | cut -d- -f2)
+        BX_PKG_PKG=${BX_PKG_NAME#bx}
+        BX_PKG_ARCH=${BX_PKG_PKG%fs}
+      else
+        BX_DEV_DEB_PATH=${SCRIPT_PATH}
+        BX_DEV_DEB_FILE=${CURL_DL_PACKAGE_NAME}
+        BX_DEV_PKG_BASE=${BX_DEV_DEB_FILE%.deb}
+      fi
+      shift
+      ;;
+    -b|--base)
+      case "$2" in
+        18|20|22|24)
+          BX_UBUNTU_VERSION=$2.04
+          ;;
+        -*|--*)
+          red; printf "expected parameter \`--base\`. (%s -h for help).\n" "${SCRIPT_NAME}"
+          exit 1;
+          ;;
+        *)
+          yellow; printf "check the system requirements for the chosen package (ubuntu:%s).\n" "${2}"
+          ;;
+      esac
+      shift
+      ;;
+    -t|--tag)
+      case "$2" in
+        -*|--*|"")
+          red; echo "expected parameter \`--tag\`. (${SCRIPT_NAME} -h for help)."
+          exit 1
+          ;;
+        *)
+          BX_USER_TAG="$2"
+          ;;
+      esac
+      shift
+      ;;
+    -z|--no-cache)
+      DOCKER_CL_NOCACHE=--no-cache
+      ;;
+    -c|--with-cmake)
+      BX_INCLUDE_CMAKE=1
+      ;;                                      
+    -g|--with-git)                            
+      BX_INCLUDE_GIT=1 
+      ;;                                      
+    -r|--with-sudo)                           
+      BX_INCLUDE_SUDO=1
+      ;;
+    -q|--no-cmsis)                           
+      BX_EXCLUDE_CMSIS=1
+      ;;
+    -n|--no-docs)                           
+      BX_EXCLUDE_DOCS=1
+      ;;
+    -s|--no-source)                           
+      BX_EXCLUDE_SRC=1
+      ;;
+    -o|--no-translation)
+      BX_EXCLUDE_JPN_FILES=1
+      ;;
+    -*|--*|*)
+      red; echo "illegal option \`${1}\`. (${SCRIPT_NAME} -h for help)" >&2
+      exit 1
+      ;;
+  esac
+  shift $(( $# > 0 ? 1 : 0))
+done
+
+function _bx_build_docker_image() {
+  if [ -z "${BX_PKG_NAME}" ]; then
+    red; echo "insufficient parameters. (${SCRIPT_NAME} -h for help)" >&2
+    exit 1
+  fi
+
+  if [ -z "${BX_USER_TAG}" ]; then
+    BX_USER_TAG="iarsystems/${BX_PKG_NAME}:${BX_PKG_VERSION}"
+  fi
+
+  if [ -z "${BX_UBUNTU_VERSION}" ]; then
+    BX_UBUNTU_VERSION=${BX_DEFAULT_UBUNTU_VERSION}
+  fi
+  
+  if [ ! -z "${BX_DEV_PKG_BASE}" ]; then
+    echo "-- C-SPY Device support package selected: \`${BX_DEV_DEB_PATH}/${BX_DEV_DEB_FILE}\`..."
+  fi
+
+  _check_docker;
+
+	case ${BX_PKG_ARCH} in
+		avr)
+			BX_ASM_EXEC=a
+			;;
+    arm|rh850|riscv|rl78|rx)
+			BX_ASM_EXEC=iasm
+			;;
+	esac
+
+  case ${BX_PKG_ARCH} in
+    arm|avr|rh850|riscv|rl78|rx)
+      echo "-- Building the container image \`${BX_USER_TAG}\` (using base image: \`ubuntu:${BX_UBUNTU_VERSION}\`)..."
+      ${DOCKER_CL} ${DOCKER_CL_NOCACHE} \
+        --build-arg BX_UBUNTU_VERSION=${BX_UBUNTU_VERSION} \
+        --build-arg BX_DEB_FILE=${BX_DEB_FILE} \
+        --build-arg BX_DEV_DEB_FILE=${BX_DEV_DEB_FILE} \
+        --build-arg BX_PKG_ARCH=${BX_PKG_ARCH} \
+				--build-arg BX_ASM_EXEC=${BX_ASM_EXEC} \
+        --build-arg BX_INCLUDE_CMAKE=${BX_INCLUDE_CMAKE} \
+        --build-arg BX_INCLUDE_GIT=${BX_INCLUDE_GIT} \
+        --build-arg BX_INCLUDE_SUDO=${BX_INCLUDE_SUDO} \
+        --build-arg BX_EXCLUDE_CMSIS=${BX_EXCLUDE_CMSIS} \
+        --build-arg BX_EXCLUDE_DOCS=${BX_EXCLUDE_DOCS} \
+        --build-arg BX_EXCLUDE_SRC=${BX_EXCLUDE_SRC} \
+        --build-arg BX_EXCLUDE_JPN_FILES=${BX_EXCLUDE_JPN_FILES} \
+        --tag ${BX_USER_TAG} \
+        ${DOCKER_CONTEXT}
+      ;;
+    *)
+      red; echo "unrecognized package \`${BX_DEB_FILE}\`. (${SCRIPT_NAME} -h for help)" >&2
+      exit 1
+      ;;
+  esac
+}
+
+
+_bx_build_docker_image 
+
+#
+# >>> Cleanup
+#
+# If copied, erase temporary context's copy
+#
+if [ ${BX_CONTEXT_COPY} -eq 1 ]; then
+  echo "-- Erasing temporary copy: \`${BX_DEB_FILE}\`."
+  rm ${DOCKER_CONTEXT}/${BX_DEB_FILE} > /dev/null
+fi
+if [ ${BX_DEV_CONTEXT_COPY} -eq 1 ]; then
+  echo "-- Erasing temporary copy: \`${BX_DEV_DEB_FILE}\`."
+  rm ${DOCKER_CONTEXT}/${BX_DEV_DEB_FILE} > /dev/null
+fi
+
+#
+# Show image creation summary
+#
+echo "-- Summary:"
+docker images ${BX_USER_TAG}

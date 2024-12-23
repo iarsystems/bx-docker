@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# Copyright (c) 2020-2025 IAR Systems AB
+# See LICENSE for detailed license information
+# 
+# Bash autocompletion for `lightlicensemanager` 
+#
+
+_lightlicensemanager()
+{
+ local cur prev words cword split
+  _init_completion -s -n : || return
+
+  case $COMP_CWORD in
+    1)
+      COMPREPLY=( $(compgen -W 'activate checkout checkin get_diagnostics \
+                                init nw{lics,usrs} products renew deactivate \
+                                setup' -- "${cur}") )
+      return;;
+    *)
+      case $prev in
+        activate)
+          COMPREPLY=-h
+          ;;
+        -*)
+          COMPREPLY=-h
+          ;;
+      esac
+  esac
+
+  $split && return
+
+  case ${cur} in
+     -*)
+       COMPREPLY=( $(compgen -W 'd h v q' -- "${cur}") )
+       [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+       return;;
+     --*)
+       COMPREPLY=( $(compgen -W 'debug help verbose quiet' -- "${cur}") )
+       [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+       return;;
+     *)
+   esac
+}
+complete -F _lightlicensemanager lightlicensemanager
+

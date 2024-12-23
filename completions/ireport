@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# Copyright (c) 2020-2025 IAR Systems AB
+# See LICENSE for detailed license information
+# 
+# Bash autocompletion for `ireport` 
+#
+
+_ireport()
+{
+ local cur prev words cword split 
+  _init_completion -s -n : || return
+
+  case $prev in
+    --db)
+      _filedir db
+      return;;
+    --project)
+      projects=( $(compgen -W '*.ewp') )
+      COMPREPLY=( $(compgen -W "$(echo ${projects[@]/.ewp})" -- "${cur}") )
+      return;;
+    --output)
+      _filedir
+      return;;
+  esac
+
+  ${split} && return
+
+  case ${cur} in
+    -*)
+      COMPREPLY=( $(compgen -W '$(_parse_help "$1")' -- "${cur}") )
+      ;;
+    *)
+      [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+      return;;
+  esac
+}
+complete -F _ireport ireport
+
