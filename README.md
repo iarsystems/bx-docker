@@ -103,8 +103,8 @@ $ ~/bx-docker/setup-license iarsystems/bx<image>:<tag> <iar-license-server-ip>
 >[!IMPORTANT]
 >Setting up the license for a Docker image in such a way only needs to be performed once per __DOCKER_HOST__. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed. For manually removing a named volume, remove all containers using it and then use `docker volume rm <volume-name>`.
 
-## Running a container
-In this section, you will run an interactive container locally, clone and build a project with the image you have created.
+## Example: interactively building a project
+Though this is not the way a container image is intended to be used, let's build a project locally and interactively with the container image you have just created.
 
 The following command line will bind the home directory (`$HOME`) to the "my-iar-bx-container" container's working directory (`/workdir`) for the `iarsystems/bx<image>:<tag>` image.
 
@@ -119,8 +119,8 @@ docker run \
   --volume $HOME:/workdir \
   iarsystems/bx<image>:<tag>
 ```
-## Example: interactively building a project
-Though this is not the way a container image is intended to be used, let's build a project interactively. For that, enter the container:
+
+Enter the container:
 ```console
 $ docker exec -it my-iar-bx-container bash
 root@<hostname>:~# 
