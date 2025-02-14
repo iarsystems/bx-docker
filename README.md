@@ -238,7 +238,7 @@ changed ownership of 'bx-workspaces-ci/tests/test-crc16.c' from root:root to <us
 ## Summary
 This tutorial guided you through one way of running the [IAR Build Tools][url-iar-bx] on Linux containers.
    
-Using the provided scripts, [Dockerfile](Dockerfile), and official [Docker Documentation][url-docker-docs], you can either use this setup as-is or customize it to ensure the containers operate according to your specific requirements. This setup can serve as a fundational element for your organization.
+Using the provided scripts, [Dockerfile](Dockerfile), and official [Docker Documentation][url-docker-docs], **you can either use this setup as-is or customize it to ensure the containers operate according to your specific requirement**s. This setup can serve as a fundational element for your organization.
 
 [__` Follow us `__](https://github.com/iarsystems) on GitHub to get updates about tutorials like this and more.
 
