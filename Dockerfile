@@ -23,10 +23,6 @@ ARG BX_DEB_FILE=bx*-?.??.?.deb
 ARG BX_DEV_DEB_FILE=bx*-cspy-device-support*.deb
 COPY ${BX_DEB_FILE} ${BX_DEV_DEB_FILE} /tmp/
 #
-# Copy bash autocompletion for IAR Build Tools
-#
-COPY completions/* /usr/share/bash-completion/completions/
-#
 # Install the necessary packages and cleanup
 #  sudo                      : required by earlier versions of bx*.deb
 #  libsqlite3-0              : required by iarbuild
