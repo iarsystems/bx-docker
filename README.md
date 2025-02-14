@@ -1,43 +1,29 @@
 # Building embedded applications with<br/> the IAR Build Tools on Docker Containers
 
-> __Disclaimer__
-> The information in this repository is subject to change without notice and does not constitute a commitment by IAR. While it serves as a valuable reference for DevOps Engineers implementing Continuous Integration with IAR Tools, IAR assumes no responsibility for any errors, omissions, or specific implementations.
+## Disclaimer
+__The information in this repository is subject to change without notice and does not constitute a commitment by IAR. While it serves as a reference for DevOps Engineers implementing Continuous Integration with IAR Tools, IAR assumes no responsibility for any errors, omissions, or specific implementations.__
 
 ## Introduction
 [Docker][url-docker-gs] is generally recognized as best practice for achieving automatically reproducible build environments. It provides the means for containerizing self-sufficient build environments that result from the requirements described in a Dockerfile.
 
 This tutorial provides a [Dockerfile](Dockerfile) and helper scripts that provide the means for building embedded applications with the [IAR Build Tools][url-iar-bx] from a Linux [container][url-docker-container].
 
-> [!TIP]
-> We recommended that you initially perform this tutorial within a test environment.
-
 ## Pre-requisites
-
-### Command line basics
-To get the most of this tutorial, you will need a basic understanding on how to use command line tools.
 
 ### IAR Build Tools
 A [__IAR Build Tools__][url-iar-bx] installer package of your choice for Ubuntu(/Debian) in the `.deb` format. IAR customers with a license can download directly from [IAR MyPages](https://iar.my.site.com/mypages). If you do not have a license yet, [contact IAR Sales][url-iar-contact].
 
-The IAR Build Tools installer packages are delivered using the following name standard:
-```
-bx<arch>[fs]-<V.vv.patch[.build]>.deb
-```
-where `[fs]` and `[.build]` in the package names show up to distinguish tools that come pre-certified for [Functional Safety](https://iar.com/fusa).
+The IAR Build Tools installer packages are delivered using the following name standard `bx<arch>[fs]-<V.vv.patch[.build]>.deb` where `[fs]` and `[.build]` in the package names show up to distinguish tools that come pre-certified for [Functional Safety](https://iar.com/fusa).
 
 ### Docker Engine
-A __x86_64/amd64__ platform supported by the Docker Engine ([supported platforms](https://docs.docker.com/engine/install/#supported-platforms)) capable of accessing the Internet for downloading the necessary packages.
-> [!NOTE]
-> In this guide, network node in which the Docker Engine was installed will be referred to as __DOCKER_HOST__.
+A __x86_64/amd64__ platform supported by the Docker Engine ([supported platforms](https://docs.docker.com/engine/install/#supported-platforms)) capable of accessing the Internet for downloading the necessary packages. In this guide, network node in which the Docker Engine was installed will be referred to as __DOCKER_HOST__.
 
 ### IAR License Server
-The [__IAR License Server__](https://links.iar.com/lms2-server) ready to serve, up and running, with __activated__ license(s) for the network nodes with the __IAR Build Tools__ of your choice -and- reachable from the platform in which the __DOCKER_HOST__ is running as described above.
-> [!TIP]
-> If you do not have the licenses you need, [__contact us__][url-iar-contact].
+The [__IAR License Server__](https://links.iar.com/lms2-server) ready to serve, up and running, with __activated__ license(s) for the network nodes with the __IAR Build Tools__ of your choice -and- reachable from the platform in which the __DOCKER_HOST__ is running as described above. If you do not have the licenses you need, [__contact us__][url-iar-contact].
 
 
 ## Installing Docker
-To install the Docker Engine on the __DOCKER_HOST__, follow the [official instructions][url-docker-docs-install].
+To install the Docker Engine on the __DOCKER_HOST__, follow the [official instructions][url-docker-docs-install]. If you want to use Docker Desktop on Windows, refer to the [wiki](https://github.com/iarsystems/bx-docker/wiki).
 
 Alternatively, launch a new bash shell and use the following procedure, known to work for most cases:
 ```bash
@@ -48,10 +34,6 @@ sh ./get-docker.sh
 sudo usermod -aG docker $USER
 sudo - $USER
 ```
-
->[!TIP]
->If you want to use Docker Desktop on Windows, refer to the [wiki](https://github.com/iarsystems/bx-docker/wiki).
-
 
 ## Building a Docker image
 Before you can run a container, you need a image containing the required environment. A Dockerfile is a text file that describe how to build a container image.
@@ -104,7 +86,7 @@ Depending on your system specifications, chosen options and installer size, it m
 >[!NOTE]
 > When building an image, it is safe to ignore eventual `debconf: delaying package configuration, since apt-utils is not installed` warning messages.
 
-## Setting up the license
+## Setting up the license 
 The IAR Build Tools require an available network license to operate.
 
 The [__`setup-license`__](setup-license) script prepares a named [Docker volume][url-docker-docs-volume] for storing persistent license configuration for any containers belonging to the same __DOCKER_HOST__. 
@@ -118,13 +100,13 @@ $ ~/bx-docker/setup-license iarsystems/bx<image>:<tag> <iar-license-server-ip>
 -- setup-license: Finished.
 ```
 
->[!TIP]
+>[!IMPORTANT]
 >Setting up the license for a Docker image in such a way only needs to be performed once per __DOCKER_HOST__. The Docker Engine will never erase this (or any other) named volume, even after the containers which made use of it are stopped or removed. For manually removing a named volume, remove all containers using it and then use `docker volume rm <volume-name>`.
 
 ## Running a container
 In this section, you will run an interactive container locally, clone and build a project with the image you have created.
 
-The following command line will bind the home directory (`$HOME`) to the "my-iar-bx-container" container's working directory (`/build`) for the `iarsystems/bx<image>:<tag>` image.
+The following command line will bind the home directory (`$HOME`) to the "my-iar-bx-container" container's working directory (`/workdir`) for the `iarsystems/bx<image>:<tag>` image.
 
 ```bash
 docker run \
@@ -134,23 +116,14 @@ docker run \
   --name my-iar-bx-container \
   --hostname `hostname` \
   --volume LMS2:/usr/local/etc/IARSystems \
-  --volume $HOME:/build \
+  --volume $HOME:/workdir \
   iarsystems/bx<image>:<tag>
 ```
->[!TIP]
->The SHA256 hash number shown in the last line is dynamically attributed by Docker to any new container while uniquely identifying it.
-
-You can check your containers with `docker container ls`:
-```console
-$ docker container ls
-CONTAINER ID  IMAGE                    COMMAND      CREATED          STATUS          NAMES
-1ab6d432393b  iarsystems/bxarm:9.60.3  "/bin/bash"  12 seconds ago   Up 11 seconds   my-iar-bx-container
-```
-
-Enter the container:
+## Example: interactively building a project
+Though this is not the way a container image is intended to be used, let's build a project interactively. For that, enter the container:
 ```console
 $ docker exec -it my-iar-bx-container bash
-root@<the-docker_host-hostname>:~# 
+root@<hostname>:~# 
 ```
 
 For this example we will clone a public repository with projects created in the [IAR Embedded Workbench IDE][url-iar-ew] for the supported target architectures:
@@ -165,7 +138,6 @@ Receiving objects: 100% (345/345), 159.12 KiB | 631.00 KiB/s, done.
 Resolving deltas: 100% (211/211), done.
 ```
 
-## Building projects with the IAR Build Tools
 Finally build the library project for the selected `<target>` (e.g. arm, avr, riscv, rl78, rx, rh850). In the following example, "arm" was selected and `iarbuild` was used to build the project:
 ```console
 # /opt/iarsystems/bxarm/common/bin/iarbuild bx-workspaces-ci/targets/arm/library.ewp -build Release
@@ -207,10 +179,6 @@ Total number of warnings: 0
 Build succeeded
 ```
 
-> [!TIP]
-> Invoke `/opt/iarsystems/bx<target>/common/bin/iarbuild` with no parameters for a detailed description of available options.
-
-
 ### Performing static code analysis
 Additionally, [IAR C-STAT][url-iar-cstat] is an add-on to the IAR Build Tools that can perform static code analysis. It helps you ensure code quality in your applications. If you have C-STAT, `iarbuild` can drive the analysis with the `-cstat_analyze <build-cfg>` command to analyze the project.
 
@@ -251,7 +219,7 @@ Now exit the container:
 # exit
 ```
 
-Thanks to running the container with the `--volume $HOME:/build` parameter, all existing files from the home directory and below are bound to the container's `/build` working directory. In this case, once you exit the container, any files within the `/build` directory will remain in their correspondent locations under the home directory.
+Thanks to running the container with the `--volume $HOME:/workdir` parameter, all existing files from the home directory and below are bound to the container's `/workdir` working directory. In this case, once you exit the container, any files within the `/workdir` directory will remain in their correspondent locations under the home directory.
 
 You will find all your project files generated in this example under `~/bx-workspaces-ci`. However they belong to root as it was the default user for the container. In order to get ownership of all generated files, perform:
 ```console
